@@ -8,11 +8,16 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="9.0.2" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.4">
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\..\Core\CheckInSystem.Business\CheckInSystem.Business.csproj" />
     <ProjectReference Include="..\..\Core\CheckInSystem.DTO\CheckInSystem.DTO.csproj" />
+    <ProjectReference Include="..\..\Core\CheckInSystem.Data\CheckInSystem.Data.csproj" />
   </ItemGroup>
 
   <ItemGroup>

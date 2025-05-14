@@ -1,6 +1,7 @@
 namespace CheckInServer.API.Controllers
 {
     using CheckInSystem.Business.Interfaces;
+    using CheckInSystem.Data;
     using CheckInSystem.DTO;
     using Microsoft.AspNetCore.Mvc;
 
@@ -16,6 +17,20 @@ namespace CheckInServer.API.Controllers
         {
             _service.UpdateStatus(dto.FlightId, dto.NewStatus);
             return Ok();
+        }
+
+        private readonly CheckInDbContext _db;
+
+        public FlightController(CheckInDbContext db)
+        {
+            _db = db;
+        }
+
+        [HttpGet]
+        public IActionResult GetAllFlights()
+        {
+            var flights = _db.Flights.ToList();
+            return Ok(flights);
         }
     }
 }
