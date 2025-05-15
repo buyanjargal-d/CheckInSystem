@@ -11,9 +11,14 @@ namespace CheckInSystem.Data.Interfaces
     {
         List<SeatDto> GetAvailableSeats(int flightId);
         bool AssignSeat(int passengerId, int seatId);
-        bool LockSeat(int seatId);
-        void UnlockSeat(int seatId);
+        //bool LockSeat(int seatId);
+        //void UnlockSeat(int seatId);
         bool IsAvailable(int seatId);
         IEnumerable<object> GetSeatsByFlightId(int flightId);
+
+        IEnumerable<SeatDto> GetAllSeatsByFlightId(int flightId);
+
+        SeatDto? GetSeatByPassengerId(int passengerId);
+
     }
 }

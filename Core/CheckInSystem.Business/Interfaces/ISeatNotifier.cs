@@ -7,9 +7,9 @@ using System.Threading.Tasks;
 
 namespace CheckInSystem.Business.Interfaces
 {
-    public interface IFlightNotifier
+    public interface ISeatNotifier
     {
-        Task NotifyFlightStatusAsync(int flightId, string status);
+        Task NotifySeatAssignedAsync(SeatDto seat);
     }
 
 }

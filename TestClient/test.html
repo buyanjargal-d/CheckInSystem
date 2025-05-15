@@ -1,0 +1,37 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <title>SignalR Test</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/7.0.5/signalr.min.js"></script>
+</head>
+<body>
+    <h2>Listening for updates...</h2>
+    <pre id="log"></pre>
+
+    <script>
+    const log = msg => {
+      document.getElementById("log").textContent += msg + "\n";
+    };
+
+    const seatConnection = new signalR.HubConnectionBuilder()
+        .withUrl("http://localhost:5052/hub/seat-updates")
+            .build();
+
+        seatConnection.start().then(() => console.log("Connected to SeatHub"));
+
+    const flightConnection = new signalR.HubConnectionBuilder()
+      .withUrl("http://localhost:5052/hub/flight-status")
+            .build();
+        flightConnection.start().then(() => log("Connected to FlightStatusHub"));
+
+    seatConnection.on("SeatAssigned", seat => {
+        console.log("🎟 Seat assigned:", seat);
+    });
+
+    flightConnection.on("FlightStatusChanged", status => {
+        log("✈️ Flight status changed: " + JSON.stringify(status));
+    });
+    
+    </script>
+</body>
+</html>

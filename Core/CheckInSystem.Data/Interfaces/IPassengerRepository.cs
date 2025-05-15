@@ -1,14 +1,15 @@
 ﻿using CheckInSystem.DTO;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using CheckInSystem.DTO.Enums;
+
 
 namespace CheckInSystem.Data.Interfaces
 {
     public interface IPassengerRepository
     {
         PassengerDto? GetByPassport(string passportNumber);
+        PassengerDto? GetById(int id);
+        void UpdateStatus(int passengerId, PassengerStatus newStatus);
+        void Add(PassengerDto dto);
+        List<PassengerDto> GetAll();
     }
 }

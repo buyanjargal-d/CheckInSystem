@@ -3,7 +3,7 @@ using CheckInSystem.Data.Interfaces;
 
 namespace CheckInSystem.Business.Services
 {
-    public class FlightStatusService
+    public class FlightStatusService : IFlightStatusService
     {
         private readonly IFlightRepository _repo;
         private readonly IFlightNotifier _notifier;

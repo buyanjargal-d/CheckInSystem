@@ -1,7 +1,7 @@
-using CheckInSystem.DTO;
 using Microsoft.AspNetCore.SignalR;
+using CheckInSystem.DTO;
 
-namespace CheckInServer.API.Hubs
+namespace CheckInSystem.Hubs
 {
     public class SeatHub : Hub
     {

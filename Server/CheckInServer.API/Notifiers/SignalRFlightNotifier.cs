@@ -1,8 +1,7 @@
 using CheckInSystem.Business.Interfaces;
-using CheckInSystem.Hubs;
 using Microsoft.AspNetCore.SignalR;
-
-namespace CheckInServer.API.Notifiers;
+using CheckInSystem.DTO;
+using CheckInSystem.Hubs;
 
 public class SignalRFlightNotifier : IFlightNotifier
 {

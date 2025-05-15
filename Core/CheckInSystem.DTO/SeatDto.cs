@@ -11,6 +11,6 @@ public class SeatDto
     public int SeatId { get; set; }
     public string SeatNumber { get; set; } = string.Empty;
     public bool IsOccupied { get; set; }
-    public int? PassengerId { get; set; } // null if unassigned
+    public int? PassengerId { get; set; } //NULL байна
 }
 

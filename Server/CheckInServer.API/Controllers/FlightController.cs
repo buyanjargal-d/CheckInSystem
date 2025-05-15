@@ -10,7 +10,13 @@ namespace CheckInServer.API.Controllers
     public class FlightController : ControllerBase
     {
         private readonly IFlightStatusService _service;
-        public FlightController(IFlightStatusService service) => _service = service;
+        private readonly CheckInDbContext _db;
+
+        public FlightController(IFlightStatusService service, CheckInDbContext db)
+        {
+            _service = service;
+            _db = db;
+        }
 
         [HttpPost("status")]
         public IActionResult UpdateStatus([FromBody] FlightStatusUpdateDto dto)
@@ -19,18 +25,22 @@ namespace CheckInServer.API.Controllers
             return Ok();
         }
 
-        private readonly CheckInDbContext _db;
-
-        public FlightController(CheckInDbContext db)
-        {
-            _db = db;
-        }
-
         [HttpGet]
         public IActionResult GetAllFlights()
         {
             var flights = _db.Flights.ToList();
             return Ok(flights);
         }
+
+        [HttpGet("{id}")]
+        public IActionResult GetFlightById(int id)
+        {
+            var flight = _db.Flights.FirstOrDefault(f => f.Id == id);
+            if (flight == null)
+                return NotFound();
+
+            return Ok(flight);
+        }
+
     }
 }

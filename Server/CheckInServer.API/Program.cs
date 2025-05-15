@@ -1,37 +1,50 @@
+using CheckInSystem.Data;
+using CheckInSystem.Data.Interfaces;
+using CheckInSystem.Data.Repositories;
 using CheckInSystem.Business.Interfaces;
 using CheckInSystem.Business.Services;
-using CheckInSystem.Data.Interfaces;
-
-using CheckInServer.API.Notifiers;
 using Microsoft.EntityFrameworkCore;
+using CheckInServer.API.Notifiers;
+using CheckInSystem.Hubs;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// ✅ Register EF Core with SQLite
 builder.Services.AddDbContext<CheckInDbContext>(options =>
     options.UseSqlite("Data Source=checkin.db"));
 
-// ✅ Register application services
 builder.Services.AddScoped<ISeatAssignmentService, SeatAssignmentService>();
 builder.Services.AddScoped<IFlightNotifier, SignalRFlightNotifier>();
+builder.Services.AddScoped<ISeatNotifier, SignalRSeatNotifier>();
+builder.Services.AddScoped<ISocketNotifier, SocketNotifier>();
+
 builder.Services.AddScoped<ISeatRepository, SeatRepository>();
 builder.Services.AddScoped<IFlightRepository, FlightRepository>();
+builder.Services.AddScoped<IPassengerRepository, PassengerRepository>();
+builder.Services.AddScoped<IFlightStatusService, FlightStatusService>();
 
-
-// ✅ Register controllers and SignalR
 builder.Services.AddControllers();
 builder.Services.AddSignalR();
 
-// ✅ Build app
+builder.Services.AddCors(options =>
+{
+    options.AddDefaultPolicy(policy =>
+    {
+        policy
+            .SetIsOriginAllowed(_ => true)
+            .AllowAnyHeader()
+            .AllowAnyMethod()
+            .AllowCredentials();
+    });
+});
+
 var app = builder.Build();
 
-// ✅ Enable routing and authorization middleware
 app.UseRouting();
+app.UseCors(); 
 app.UseAuthorization();
 
-// ✅ Map endpoints
 app.MapControllers();
-//app.MapHub<FlightHub>("/hub"); // Optional: replace or remove if not using this hub
+app.MapHub<FlightStatusHub>("/hub/flight-status");
+app.MapHub<SeatHub>("/hub/seat-updates");
 
-// ✅ Run the application
 app.Run();

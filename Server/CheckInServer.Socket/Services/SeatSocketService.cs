@@ -49,18 +49,17 @@ public class SeatSocketService
             {
                 Console.WriteLine($"Message Type: {message.Type}, Seat: {message.SeatId}, Passenger: {message.PassengerId}");
 
-                // Example usage
                 switch (message.Type)
                 {
-                    case SocketMessageType.Lock:
-                        Console.WriteLine("Locking seat...");
-                        break;
+                    //case SocketMessageType.Lock:
+                    //    Console.WriteLine("Locking seat...");
+                    //    break;
                     case SocketMessageType.Assign:
                         Console.WriteLine("Assigning seat...");
                         break;
-                    case SocketMessageType.Unlock:
-                        Console.WriteLine("Unlocking seat...");
-                        break;
+                    //case SocketMessageType.Unlock:
+                    //    Console.WriteLine("Unlocking seat...");
+                    //    break;
                 }
             }
             else
