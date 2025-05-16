@@ -159,7 +159,9 @@ Simple console app to send test socket messages to TCP server.
 
 ## ✅ Prerequisites
 
-- .NET SDK 9  
+- .NET SDK 7/8/9  
+- Optional: Visual Studio / VS Code / Rider  
+- (Linux only) EF tools:
 
 ```bash
 dotnet tool install --global dotnet-ef
@@ -229,7 +231,7 @@ sqlite3 checkin.db
 
 ## 1. 🔌 Run the REST API (with SignalR Hubs)
 
-This runs your HTTP REST API on `https://localhost:5052`.
+This runs your HTTP REST API on `https://localhost:5052` (or `http://localhost:5051` if using HTTP only).
 
 ```bash
 dotnet run --project Server/CheckInServer.API
@@ -309,6 +311,7 @@ http://localhost:5052/api/seats/assign
 The REST API is served via `CheckInServer.API`, typically at:
 
 - **HTTP**: `http://localhost:5052`
+- **HTTPS**: `https://localhost:7052` (depending on your launch settings)
 
 ---
 
@@ -319,6 +322,8 @@ The REST API is served via `CheckInServer.API`, typically at:
 | `/api/seats/available?flightId=1`      | GET    | Get all available seats for a specific flight   |
 | `/api/seats/all?flightId=1`            | GET    | Get all seats (including assigned/locked)       |
 | `/api/seats/assign`                    | POST   | Assign a seat to a passenger (if available)     |
+| `/api/seats/lock`                      | POST   | Lock a seat (temporarily reserve)               |
+| `/api/seats/unlock`                    | POST   | Unlock a previously locked seat                 |
 
 ### 🔄 Sample Payload for Assigning Seat:
 
@@ -444,3 +449,217 @@ app.UseCors(); // Must be above UseAuthorization()
 ```
 
 ---
+
+
+# 🧪 Test Instructions
+
+These steps will help you verify the key functionalities of your system: REST APIs, SignalR real-time updates, and TCP Socket notifications.
+
+---
+
+## ✅ 1. Run Servers
+
+Make sure all servers are running:
+
+```bash
+# Run REST API
+dotnet run --project Server/CheckInServer.API
+
+# Run Socket Server
+dotnet run --project Server/CheckInServer.Socket
+```
+
+---
+
+## 🧐‍♂️ Passenger Tests
+
+### ➕ Add a New Passenger
+
+```http
+POST http://localhost:5052/api/passengers
+```
+
+**Body (JSON):**
+
+```json
+{
+  "fullName": "John Wick",
+  "passportNumber": "JW123456",
+  "flightId": 1,
+  "status": 0
+}
+```
+
+**✅ Expected:** 201 Created with full passenger data
+
+### 🔍 Search Passenger by Passport
+
+```http
+GET http://localhost:5052/api/passengers/JW123456
+```
+
+**✅ Expected:** JSON with passenger info
+
+---
+
+## 🎟 Seat Assignment Tests
+
+### ✅ Get All Seats for a Flight
+
+```http
+GET http://localhost:5052/api/seats/all?flightId=1
+```
+
+**✅ Lists all seats with assignment and lock state**
+
+### 🚑 Get Available Seats
+
+```http
+GET http://localhost:5052/api/seats/available?flightId=1
+```
+
+**✅ Lists only unassigned and unlocked seats**
+
+### 🎯 Assign a Seat
+
+```http
+POST http://localhost:5052/api/seats/assign
+```
+
+**Body:**
+
+```json
+{
+  "passengerId": 101,
+  "seatId": 12
+}
+```
+
+**✅ Expected:** `{ "status": "assigned" }`
+
+**🧠 Also triggers:**
+
+- ✔ Updates passenger status to `CheckedIn`
+- ✔ Sends a message to the Socket server (port 5050)
+- ✔ Emits a real-time update via SignalR SeatHub
+
+### 🔐 Lock a Seat
+
+```http
+POST http://localhost:5052/api/seats/lock
+```
+
+**Body:**
+
+```json
+{
+  "seatId": 10
+}
+```
+
+### 🔓 Unlock a Seat
+
+```http
+POST http://localhost:5052/api/seats/unlock
+```
+
+**Body:**
+
+```json
+{
+  "seatId": 10
+}
+```
+
+---
+
+## ✈️ Flight Tests
+
+### ✈️ List All Flights
+
+```http
+GET http://localhost:5052/api/flights
+```
+
+**✅ Lists seeded flights and current statuses**
+
+### 🔄 Change Flight Status
+
+```http
+POST http://localhost:5052/api/flights/status
+```
+
+**Body:**
+
+```json
+{
+  "flightId": 1,
+  "newStatus": "Boarding"
+}
+```
+
+**✅ Will broadcast update via SignalR (FlightStatusChanged)**
+
+---
+
+## 🗾 Boarding Pass
+
+### 🎫 Print Boarding Pass
+
+```http
+GET http://localhost:5052/api/passengers/boarding/JW123456
+```
+
+**✅ JSON-style boarding pass with:**
+
+- Passenger
+- Seat
+- Flight info
+
+---
+
+## 🌐 SignalR Testing via `test.html`
+
+Use this HTML for real-time events:
+
+```html
+<script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/7.0.5/signalr.min.js"></script>
+
+<script>
+    const seatConn = new signalR.HubConnectionBuilder()
+        .withUrl("http://localhost:5052/hub/seat-updates")
+        .build();
+
+    const flightConn = new signalR.HubConnectionBuilder()
+        .withUrl("http://localhost:5052/hub/flight-status")
+        .build();
+
+    seatConn.on("SeatAssigned", seat => {
+        console.log("🎟 Seat Assigned via SignalR:", seat);
+    });
+
+    flightConn.on("FlightStatusChanged", data => {
+        console.log("✈️ Flight Status Changed:", data);
+    });
+
+    seatConn.start().then(() => console.log("✅ SeatHub connected"));
+    flightConn.start().then(() => console.log("✅ FlightHub connected"));
+</script>
+```
+
+**📂 Save this as `test.html` and open in a browser.**
+
+---
+
+## 🧪 TCP Socket Test
+
+Run this to test the raw socket client:
+
+```bash
+dotnet run --project TestClient/SocketTestClient
+```
+
+**✅ Should print:**
+
+```pgsql
+✅ Response from server: ACK
