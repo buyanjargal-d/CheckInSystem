@@ -7,7 +7,7 @@ A modular .NET-based check-in system for managing flight passenger check-ins, se
 # 📦 CheckIn System Project Structure
 
 ## ✅ Core/ — Core Application Logic
-This folder holds your core layers: DTOs, Data Access, and Business Logic.
+This folder holds core layers: DTOs, Data Access, and Business Logic.
 
 ### 🔹 CheckInSystem.DTO/
 Contains all Data Transfer Objects (DTOs) and Enums used across the app.
@@ -81,7 +81,7 @@ Contains the REST API, SignalR hubs, and configuration.
 **Controllers/**
 - `FlightController.cs` — Manage flight status, list flights.
 - `PassengerController.cs` — Add/search passengers, print boarding pass.
-- `SeatController.cs` — Assign, lock/unlock, and list seats.
+- `SeatController.cs` — Assign and list seats.
 
 **Hubs/**
 - `FlightStatusHub.cs` — Broadcast flight status changes.
@@ -98,12 +98,12 @@ Contains the REST API, SignalR hubs, and configuration.
 - `/hub/seat-updates`
 
 ### 🔹 CheckInServer.Socket/
-Standalone TCP socket server for handling real-time seat locking/assigning via JSON.
+Standalone TCP socket server for handling real-time seat assigning via JSON.
 
 **Structure:**
 
 **Models/**
-- `SocketMessage.cs` — message format (Assign, Lock, Unlock)
+- `SocketMessage.cs` — message format (Assign)
 
 **Services/**
 - `SeatSocketService.cs` — TCP server using TcpListener
@@ -159,8 +159,7 @@ Simple console app to send test socket messages to TCP server.
 
 ## ✅ Prerequisites
 
-- .NET SDK 7/8/9  
-- Optional: Visual Studio / VS Code / Rider  
+- .NET SDK 9   
 - (Linux only) EF tools:
 
 ```bash
@@ -174,7 +173,7 @@ dotnet tool install --global dotnet-ef
 ### 1. Clone the repository
 
 ```bash
-git clone <your-repo-url>
+git clone <repo-url>
 cd CheckInSystem
 ```
 
@@ -194,9 +193,18 @@ dotnet build
 
 ## 🧩 Database Setup (SQLite + EF Core)
 
-We are using SQLite and EF Core Migrations to create and seed the `checkin.db`.
+Used SQLite and EF Core Migrations to create and seed the `checkin.db`.
 
-### 4. Add Migration (optional if not yet created)
+If the database or migrations already exist, reset them with:
+
+```bash
+rm Server/CheckInServer.API/checkin.db
+rm -r Core/CheckInSystem.Data/Migrations
+```
+
+Then proceed with the migration and update steps as described below.
+
+### 4. Add Migration
 
 ```bash
 dotnet ef migrations add InitWithSeed \
@@ -212,7 +220,7 @@ dotnet ef database update \
   --startup-project Server/CheckInServer.API/CheckInServer.API.csproj
 ```
 
-🔹 This will create `checkin.db` and seed passengers, seats, and flights (if defined in `OnModelCreating`).
+🔹 This will create `checkin.db` and seed passengers, seats, and flights (defined in `OnModelCreating`).
 
 ---
 
@@ -231,7 +239,7 @@ sqlite3 checkin.db
 
 ## 1. 🔌 Run the REST API (with SignalR Hubs)
 
-This runs your HTTP REST API on `https://localhost:5052` (or `http://localhost:5051` if using HTTP only).
+This runs your HTTP REST API on `https://localhost:5052`.
 
 ```bash
 dotnet run --project Server/CheckInServer.API
@@ -266,8 +274,11 @@ dotnet run --project Server/CheckInServer.Socket
 ```bash
 Socket server listening on port 5050...
 Client connected.
+Message Type: Assign, Seat: 201, Passenger: 101
 Assigning seat...
 ```
+
+After Postman/Client Connected "Client Connected" will be printed. And After Assigning Seat "Assigning seat..." will be printed.
 
 ---
 
@@ -295,7 +306,7 @@ curl -X POST http://localhost:5052/api/seats/assign \
 http://localhost:5052/api/seats/assign
 ```
 
-4. Add raw JSON body:
+4. Add raw JSON body: <Body --> Raw>
 
 ```json
 {
@@ -311,7 +322,6 @@ http://localhost:5052/api/seats/assign
 The REST API is served via `CheckInServer.API`, typically at:
 
 - **HTTP**: `http://localhost:5052`
-- **HTTPS**: `https://localhost:7052` (depending on your launch settings)
 
 ---
 
@@ -322,8 +332,6 @@ The REST API is served via `CheckInServer.API`, typically at:
 | `/api/seats/available?flightId=1`      | GET    | Get all available seats for a specific flight   |
 | `/api/seats/all?flightId=1`            | GET    | Get all seats (including assigned/locked)       |
 | `/api/seats/assign`                    | POST   | Assign a seat to a passenger (if available)     |
-| `/api/seats/lock`                      | POST   | Lock a seat (temporarily reserve)               |
-| `/api/seats/unlock`                    | POST   | Unlock a previously locked seat                 |
 
 ### 🔄 Sample Payload for Assigning Seat:
 
@@ -343,20 +351,7 @@ POST /api/seats/assign
 |-----------------------------------------|--------|---------------------------------------------|
 | `/api/passengers`                       | GET    | List all passengers                        |
 | `/api/passengers/{passportNumber}`      | GET    | Get passenger info by passport             |
-| `/api/passengers`                       | POST   | Add a new passenger                        |
 | `/api/passengers/boarding/{passportNumber}` | GET | Generate a boarding pass (JSON)            |
-
-### 🗾 Sample Payload to Add Passenger:
-
-```json
-POST /api/passengers
-{
-  "fullName": "Jane Doe",
-  "passportNumber": "XA123456",
-  "flightId": 1,
-  "status": 0
-}
-```
 
 ---
 
@@ -366,6 +361,7 @@ POST /api/passengers
 |------------------------|--------|------------------------------|
 | `/api/flights`         | GET    | List all flights            |
 | `/api/flights/status`  | POST   | Change flight status        |
+| `/api/flights/{id}`  | GET   | Get specific flight       |
 
 ### 🔄 Sample Payload for Updating Flight Status:
 
@@ -453,7 +449,7 @@ app.UseCors(); // Must be above UseAuthorization()
 
 # 🧪 Test Instructions
 
-These steps will help you verify the key functionalities of your system: REST APIs, SignalR real-time updates, and TCP Socket notifications.
+Tesint REST APIs, SignalR real-time updates, and TCP Socket notifications.
 
 ---
 
@@ -472,25 +468,6 @@ dotnet run --project Server/CheckInServer.Socket
 ---
 
 ## 🧐‍♂️ Passenger Tests
-
-### ➕ Add a New Passenger
-
-```http
-POST http://localhost:5052/api/passengers
-```
-
-**Body (JSON):**
-
-```json
-{
-  "fullName": "John Wick",
-  "passportNumber": "JW123456",
-  "flightId": 1,
-  "status": 0
-}
-```
-
-**✅ Expected:** 201 Created with full passenger data
 
 ### 🔍 Search Passenger by Passport
 
@@ -541,37 +518,7 @@ POST http://localhost:5052/api/seats/assign
 
 - ✔ Updates passenger status to `CheckedIn`
 - ✔ Sends a message to the Socket server (port 5050)
-- ✔ Emits a real-time update via SignalR SeatHub
-
-### 🔐 Lock a Seat
-
-```http
-POST http://localhost:5052/api/seats/lock
-```
-
-**Body:**
-
-```json
-{
-  "seatId": 10
-}
-```
-
-### 🔓 Unlock a Seat
-
-```http
-POST http://localhost:5052/api/seats/unlock
-```
-
-**Body:**
-
-```json
-{
-  "seatId": 10
-}
-```
-
----
+- ✔ Emits a real-time update via SignalR SeatHub (test.html in Browser)
 
 ## ✈️ Flight Tests
 
@@ -598,7 +545,7 @@ POST http://localhost:5052/api/flights/status
 }
 ```
 
-**✅ Will broadcast update via SignalR (FlightStatusChanged)**
+**✅ Will broadcast update via SignalR (FlightStatusChanged) (test.html in Browser) **
 
 ---
 
