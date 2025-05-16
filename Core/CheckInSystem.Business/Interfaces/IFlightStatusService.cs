@@ -6,8 +6,17 @@ using System.Threading.Tasks;
 
 namespace CheckInSystem.Business.Interfaces
 {
+    /// <summary>
+    /// Нислэгийн төлөвийн үйлчилгээний интерфейс.
+    /// Энэ интерфейс нь нислэгийн төлөвийг шинэчлэх үйлдлийг тодорхойлно.
+    /// </summary>
     public interface IFlightStatusService
     {
+        /// <summary>
+        /// Нислэгийн төлөвийг шинэчлэх.
+        /// </summary>
+        /// <param name="flightId">Нислэгийн давтагдашгүй дугаар</param>
+        /// <param name="newStatus">Шинэ төлөв</param>
         void UpdateStatus(int flightId, string newStatus);
     }
 }

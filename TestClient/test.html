@@ -5,31 +5,39 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/7.0.5/signalr.min.js"></script>
 </head>
 <body>
-    <h2>Listening for updates...</h2>
+    <h2>Шинэчлэлтийг сонсож байна...</h2>
     <pre id="log"></pre>
 
     <script>
+    // Мессежийг log хэсэгт нэмэх функц
     const log = msg => {
       document.getElementById("log").textContent += msg + "\n";
     };
 
+    // Суудлын шинэчлэлтийн SignalR холболтыг үүсгэх
     const seatConnection = new signalR.HubConnectionBuilder()
         .withUrl("http://localhost:5052/hub/seat-updates")
             .build();
 
-        seatConnection.start().then(() => console.log("Connected to SeatHub"));
+    // Суудлын холболтыг эхлүүлэх
+    seatConnection.start().then(() => console.log("SeatHub-д холбогдлоо"));
 
+    // Нислэгийн статусын SignalR холболтыг үүсгэх
     const flightConnection = new signalR.HubConnectionBuilder()
       .withUrl("http://localhost:5052/hub/flight-status")
             .build();
-        flightConnection.start().then(() => log("Connected to FlightStatusHub"));
 
+    // Нислэгийн холболтыг эхлүүлэх
+    flightConnection.start().then(() => log("FlightStatusHub-д холбогдлоо"));
+
+    // Суудал оноогдсон үед дуудагдах функц
     seatConnection.on("SeatAssigned", seat => {
-        console.log("🎟 Seat assigned:", seat);
+        console.log("🎟 Суудал оноогдлоо:", seat);
     });
 
+    // Нислэгийн статус өөрчлөгдсөн үед дуудагдах функц
     flightConnection.on("FlightStatusChanged", status => {
-        log("✈️ Flight status changed: " + JSON.stringify(status));
+        log("✈️ Нислэгийн статус өөрчлөгдлөө: " + JSON.stringify(status));
     });
     
     </script>

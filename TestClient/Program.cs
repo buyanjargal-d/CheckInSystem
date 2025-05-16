@@ -4,31 +4,36 @@ using System.Text.Json;
 using System.Text;
 using System.Threading.Tasks;
 
+// HttpClient объектийг үүсгэж, үндсэн хаягийг тохируулна
 var http = new HttpClient();
-http.BaseAddress = new Uri("http://localhost:5052"); // Match your API port
+http.BaseAddress = new Uri("http://localhost:5052");
 http.DefaultRequestHeaders.Add("Accept", "application/json");
 
-// Trust the SSL cert (only for local dev — skip in production!)
+// Серверийн гэрчилгээг шалгахгүйгээр зөвшөөрөх тохиргоо
 HttpClientHandler handler = new HttpClientHandler();
 handler.ServerCertificateCustomValidationCallback = HttpClientHandler.DangerousAcceptAnyServerCertificateValidator;
 
-// Assign seat example
+// Суудал оноох хүсэлтийн өгөгдлийг бэлтгэнэ
 var assignRequest = new
 {
-    passengerId = 101,
-    seatId = 15
+    passengerId = 101, // зорчигчийн дугаар
+    seatId = 15       // суудлын дугаар
 };
 
-Console.WriteLine("Sending seat assignment request...");
-Console.WriteLine($"Requesting: {http.BaseAddress}api/seats/assign");
+Console.WriteLine("Суудал оноох хүсэлт илгээж байна...");
+// Хүсэлт илгээх хаягийг хэвлэнэ
+Console.WriteLine($"Хүсэлт илгээж байна: {http.BaseAddress}api/seats/assign");
+// POST хүсэлтийг илгээж, хариуг авна
 var response = await http.PostAsJsonAsync("api/seats/assign", assignRequest);
 
+// Хариу амжилттай бол үр дүнг хэвлэнэ
 if (response.IsSuccessStatusCode)
 {
     var result = await response.Content.ReadAsStringAsync();
-    Console.WriteLine("✅ Success: " + result);
+    Console.WriteLine("Амжилттай: " + result);
 }
 else
 {
-    Console.WriteLine("❌ Failed: " + response.StatusCode);
+    // Хэрэв амжилтгүй бол статус кодыг хэвлэнэ
+    Console.WriteLine("Амжилтгүй: " + response.StatusCode);
 }

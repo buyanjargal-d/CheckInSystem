@@ -1,26 +1,50 @@
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using CheckInSystem.Data.Models;
 using CheckInSystem.DTO.Enums;
 
 namespace CheckInSystem.Data;
 
+/// <summary>
+/// CheckInDbContext ангилал нь Entity Framework Core ашиглан нислэгийн бүртгэлийн системийн өгөгдлийн сангийн контекстийг тодорхойлно.
+/// Энэ ангилал нь нислэг (Flight), суудал (Seat), зорчигч (Passenger) зэрэг өгөгдлийн сангийн хүснэгтүүдийг удирдана.
+/// </summary>
 public class CheckInDbContext : DbContext
 {
-    public CheckInDbContext(DbContextOptions<CheckInDbContext> options) : base(options) {}
+    /// <summary>
+    /// CheckInDbContext-ийн шинэ жишээг үүсгэнэ.
+    /// </summary>
+    /// <param name="options">DbContext-ийн тохиргооны параметрүүд.</param>
+    public CheckInDbContext(DbContextOptions<CheckInDbContext> options) : base(options) { }
 
+    /// <summary>
+    /// Нислэгийн хүснэгтэд хандах DbSet.
+    /// </summary>
     public DbSet<Flight> Flights => Set<Flight>();
+
+    /// <summary>
+    /// Суудлын хүснэгтэд хандах DbSet.
+    /// </summary>
     public DbSet<Seat> Seats => Set<Seat>();
+
+    /// <summary>
+    /// Зорчигчийн хүснэгтэд хандах DbSet.
+    /// </summary>
     public DbSet<Passenger> Passengers { get; set; }
 
+    /// <summary>
+    /// Өгөгдлийн сангийн анхны өгөгдлийг (seed data) тохируулна.
+    /// </summary>
+    /// <param name="modelBuilder">ModelBuilder объект.</param>
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        // Нислэгийн анхны өгөгдөл
         modelBuilder.Entity<Flight>().HasData(
             new Flight
             {
                 Id = 1,
                 FlightNumber = "AB123",
                 Status = "CheckingIn",
-                DepartureTime = new DateTime(2025, 05, 15, 8, 0, 0, DateTimeKind.Utc) 
+                DepartureTime = new DateTime(2025, 05, 15, 8, 0, 0, DateTimeKind.Utc)
             },
             new Flight
             {
@@ -31,6 +55,7 @@ public class CheckInDbContext : DbContext
             }
         );
 
+        // Зорчигчийн анхны өгөгдөл
         modelBuilder.Entity<Passenger>().HasData(
            new Passenger
            {
@@ -58,6 +83,7 @@ public class CheckInDbContext : DbContext
            }
        );
 
+        // Суудлын анхны өгөгдөл
         modelBuilder.Entity<Seat>().HasData(
             new Seat { SeatId = 201, SeatNumber = "12A", IsOccupied = false, FlightId = 1 },
             new Seat { SeatId = 202, SeatNumber = "12B", IsOccupied = false, FlightId = 1 },

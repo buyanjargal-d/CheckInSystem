@@ -1,4 +1,4 @@
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using CheckInSystem.Data;
 using CheckInSystem.Data.Repositories;
 using CheckInSystem.Data.Interfaces;
@@ -7,6 +7,10 @@ using CheckInSystem.DTO;
 
 namespace CheckInServer.API.Controllers
 {
+    /// <summary>
+    /// PassengerController нь зорчигчийн мэдээлэлтэй холбоотой API үйлдлүүдийг гүйцэтгэх контроллер юм.
+    /// Энэ контроллер нь зорчигчийн жагсаалт авах, паспортын дугаараар хайх, зорчигчийн суудал болон нислэгийн мэдээлэл бүхий суудлын тасалбар авах зэрэг үйлдлүүдийг агуулна.
+    /// </summary>
     [ApiController]
     [Route("api/passengers")]
     public class PassengerController : ControllerBase
@@ -14,12 +18,21 @@ namespace CheckInServer.API.Controllers
         private readonly IPassengerRepository _repository;
         private readonly CheckInDbContext _db;
 
+        /// <summary>
+        /// PassengerController-ийн шинэ жишээг үүсгэх конструктор.
+        /// </summary>
+        /// <param name="repository">Зорчигчийн өгөгдлийн сангийн репозиторийн интерфейс.</param>
+        /// <param name="db">CheckInDbContext өгөгдлийн сангийн контекст.</param>
         public PassengerController(IPassengerRepository repository, CheckInDbContext db)
         {
             _repository = repository;
             _db = db;
         }
 
+        /// <summary>
+        /// Бүх зорчигчийн жагсаалтыг авах GET үйлдэл.
+        /// </summary>
+        /// <returns>Зорчигчдын жагсаалт (PassengerDto)</returns>
         [HttpGet]
         public IActionResult GetAll()
         {
@@ -27,6 +40,11 @@ namespace CheckInServer.API.Controllers
             return Ok(all);
         }
 
+        /// <summary>
+        /// Паспортын дугаараар зорчигчийн мэдээлэл авах GET үйлдэл.
+        /// </summary>
+        /// <param name="passportNumber">Зорчигчийн паспортын дугаар</param>
+        /// <returns>Зорчигчийн мэдээлэл эсвэл NotFound</returns>
         [HttpGet("{passportNumber}")]
         public IActionResult GetByPassport(string passportNumber)
         {
@@ -34,13 +52,25 @@ namespace CheckInServer.API.Controllers
             return passenger is null ? NotFound() : Ok(passenger);
         }
 
-        //[HttpPost]
-        //public IActionResult Add([FromBody] PassengerDto dto)
-        //{
-        //    _repository.Add(dto);
-        //    return CreatedAtAction(nameof(GetByPassport), new { passportNumber = dto.PassportNumber }, dto);
-        //}
+        /*
+        /// <summary>
+        /// Шинэ зорчигч нэмэх POST үйлдэл.
+        /// </summary>
+        /// <param name="dto">Зорчигчийн мэдээлэл</param>
+        /// <returns>Үүссэн зорчигчийн мэдээлэл</returns>
+        [HttpPost]
+        public IActionResult Add([FromBody] PassengerDto dto)
+        {
+            _repository.Add(dto);
+            return CreatedAtAction(nameof(GetByPassport), new { passportNumber = dto.PassportNumber }, dto);
+        }
+        */
 
+        /// <summary>
+        /// Паспортын дугаараар зорчигчийн суудлын тасалбарын мэдээлэл авах GET үйлдэл.
+        /// </summary>
+        /// <param name="passportNumber">Зорчигчийн паспортын дугаар</param>
+        /// <returns>Суудлын тасалбарын мэдээлэл эсвэл NotFound</returns>
         [HttpGet("boarding-pass/{passportNumber}")]
         public IActionResult GetBoardingPass(string passportNumber)
         {
@@ -68,6 +98,5 @@ namespace CheckInServer.API.Controllers
 
             return Ok(boardingPass);
         }
-
     }
 }

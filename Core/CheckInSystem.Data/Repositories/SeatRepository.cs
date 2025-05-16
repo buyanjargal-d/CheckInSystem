@@ -5,15 +5,28 @@ using Microsoft.EntityFrameworkCore;
 
 namespace CheckInSystem.Data.Repositories
 {
+    /// <summary>
+    /// SeatRepository ангилал нь суудлын өгөгдлийн сангийн үйлдлүүдийг гүйцэтгэхэд ашиглагдана.
+    /// Энэ ангилал нь нислэгийн суудлуудыг авах, оноох, шалгах зэрэг үндсэн үйлдлүүдийг хэрэгжүүлдэг.
+    /// </summary>
     public class SeatRepository : ISeatRepository
     {
         private readonly CheckInDbContext _context;
 
+        /// <summary>
+        /// SeatRepository-ийн шинэ экземплярыг үүсгэнэ.
+        /// </summary>
+        /// <param name="context">Өгөгдлийн сангийн контекст</param>
         public SeatRepository(CheckInDbContext context)
         {
             _context = context;
         }
 
+        /// <summary>
+        /// Тухайн нислэгийн боломжит (чөлөөтэй) суудлуудыг буцаана.
+        /// </summary>
+        /// <param name="flightId">Нислэгийн ID</param>
+        /// <returns>Суудлын DTO жагсаалт</returns>
         public List<SeatDto> GetAvailableSeats(int flightId)
         {
             return _context.Seats
@@ -28,6 +41,12 @@ namespace CheckInSystem.Data.Repositories
                 .ToList();
         }
 
+        /// <summary>
+        /// Суудлыг зорчигчид оноох.
+        /// </summary>
+        /// <param name="passengerId">Зорчигчийн ID</param>
+        /// <param name="seatId">Суудлын ID</param>
+        /// <returns>Амжилттай оноосон эсэх</returns>
         public bool AssignSeat(int passengerId, int seatId)
         {
             var seat = _context.Seats.FirstOrDefault(s => s.SeatId == seatId);
@@ -43,7 +62,7 @@ namespace CheckInSystem.Data.Repositories
         //{
         //    var seat = _context.Seats.FirstOrDefault(s => s.SeatId == seatId);
         //    if (seat == null || seat.IsOccupied) return false;
-
+        //
         //    seat.IsOccupied = true;
         //    _context.SaveChanges();
         //    return true;
@@ -60,12 +79,22 @@ namespace CheckInSystem.Data.Repositories
         //    }
         //}
 
+        /// <summary>
+        /// Суудал чөлөөтэй эсэхийг шалгана.
+        /// </summary>
+        /// <param name="seatId">Суудлын ID</param>
+        /// <returns>Чөлөөтэй бол true</returns>
         public bool IsAvailable(int seatId)
         {
             var seat = _context.Seats.FirstOrDefault(s => s.SeatId == seatId);
             return seat != null && !seat.IsOccupied;
         }
 
+        /// <summary>
+        /// Нислэгийн бүх суудлыг буцаана (object төрөлтэй).
+        /// </summary>
+        /// <param name="flightId">Нислэгийн ID</param>
+        /// <returns>Суудлын жагсаалт</returns>
         public IEnumerable<object> GetSeatsByFlightId(int flightId)
         {
             return _context.Seats
@@ -80,6 +109,11 @@ namespace CheckInSystem.Data.Repositories
                 .ToList();
         }
 
+        /// <summary>
+        /// Нислэгийн бүх суудлыг SeatDto хэлбэрээр буцаана.
+        /// </summary>
+        /// <param name="flightId">Нислэгийн ID</param>
+        /// <returns>SeatDto жагсаалт</returns>
         public IEnumerable<SeatDto> GetAllSeatsByFlightId(int flightId)
         {
             return _context.Seats
@@ -94,6 +128,11 @@ namespace CheckInSystem.Data.Repositories
                 .ToList();
         }
 
+        /// <summary>
+        /// Зорчигчийн ID-аар суудлыг буцаана.
+        /// </summary>
+        /// <param name="passengerId">Зорчигчийн ID</param>
+        /// <returns>SeatDto эсвэл null</returns>
         public SeatDto? GetSeatByPassengerId(int passengerId)
         {
             var seat = _context.Seats.FirstOrDefault(s => s.PassengerId == passengerId);
@@ -105,6 +144,5 @@ namespace CheckInSystem.Data.Repositories
                 PassengerId = seat.PassengerId
             };
         }
-
     }
 }

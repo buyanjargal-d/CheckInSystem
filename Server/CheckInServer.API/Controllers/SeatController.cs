@@ -4,17 +4,35 @@
     using CheckInSystem.DTO;
     using Microsoft.AspNetCore.Mvc;
 
+    /// <summary>
+    /// Суудалтай холбоотой үйлдлүүдийг гүйцэтгэх API контроллер.
+    /// Энэ контроллер нь нислэгийн суудлуудын мэдээлэл авах, суудал оноох зэрэг үйлдлүүдийг гүйцэтгэнэ.
+    /// </summary>
     [ApiController]
     [Route("api/seats")]
     public class SeatController : ControllerBase
     {
         private readonly ISeatAssignmentService _service;
 
+        /// <summary>
+        /// SeatController-ийн конструктор. Суудал оноох үйлчилгээний хамаарлыг авна.
+        /// </summary>
+        /// <param name="service">Суудал оноох үйлчилгээ</param>
         public SeatController(ISeatAssignmentService service) => _service = service;
 
+        /// <summary>
+        /// Нислэгийн боломжит (сул) суудлуудыг авах.
+        /// </summary>
+        /// <param name="flightId">Нислэгийн дугаар</param>
+        /// <returns>Боломжит суудлуудын жагсаалт</returns>
         [HttpGet("available")]
         public IActionResult GetAvailable(int flightId) => Ok(_service.GetAvailableSeats(flightId));
 
+        /// <summary>
+        /// Зорчигчид суудал оноох үйлдэл.
+        /// </summary>
+        /// <param name="dto">Суудал оноох хүсэлтийн өгөгдөл</param>
+        /// <returns>Оноох үйлдлийн үр дүн</returns>
         [HttpPost("assign")]
         public async Task<IActionResult> Assign([FromBody] AssignSeatRequestDto dto)
         {
@@ -35,13 +53,18 @@
                 : Conflict(new { status = "seat_taken" });
         }
 
-
-
+        /// <summary>
+        /// Нислэгийн бүх суудлуудын мэдээллийг авах.
+        /// </summary>
+        /// <param name="flightId">Нислэгийн дугаар</param>
+        /// <returns>Бүх суудлуудын жагсаалт</returns>
         [HttpGet("all")]
         public IActionResult GetAll(int flightId)
         {
             return Ok(_service.GetAllSeats(flightId));
         }
+
+        // Доорх кодыг шаардлагатай үед идэвхжүүлж ашиглана уу.
 
         //[HttpPost("lock/{seatId}")]
         //public IActionResult Lock(int seatId)
@@ -57,7 +80,6 @@
         //    _service.UnlockSeat(seatId);
         //    return Ok(new { status = "unlocked" });
         //}
-
 
         //[HttpGet("test-seat-signalr")]
         //public async Task<IActionResult> TestSignalRSeat([FromServices] ISeatNotifier notifier)
