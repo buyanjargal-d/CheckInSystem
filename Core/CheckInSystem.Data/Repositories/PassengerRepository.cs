@@ -15,7 +15,7 @@ namespace CheckInSystem.Data.Repositories
         private readonly CheckInDbContext _context;
 
         /// <summary>
-        /// PassengerRepository-ийн шинэ экземплярыг үүсгэнэ.
+        /// PassengerRepository-ийн үүсгэнэ.
         /// </summary>
         /// <param name="context">Өгөгдлийн сангийн контекст</param>
         public PassengerRepository(CheckInDbContext context)
@@ -80,25 +80,25 @@ namespace CheckInSystem.Data.Repositories
             }
         }
 
-        /// <summary>
-        /// Шинэ зорчигчийн мэдээллийг өгөгдлийн санд нэмнэ.
-        /// </summary>
-        /// <param name="dto">Зорчигчийн DTO мэдээлэл</param>
-        public void Add(PassengerDto dto)
-        {
-            var passenger = new Passenger
-            {
-                FullName = dto.FullName,
-                PassportNumber = dto.PassportNumber,
-                FlightId = dto.FlightId,
-                Status = dto.Status
-            };
+        ///// <summary>
+        ///// Шинэ зорчигчийн мэдээллийг өгөгдлийн санд нэмнэ.
+        ///// </summary>
+        ///// <param name="dto">Зорчигчийн DTO мэдээлэл</param>
+        //public void Add(PassengerDto dto)
+        //{
+        //    var passenger = new Passenger
+        //    {
+        //        FullName = dto.FullName,
+        //        PassportNumber = dto.PassportNumber,
+        //        FlightId = dto.FlightId,
+        //        Status = dto.Status
+        //    };
 
-            _context.Passengers.Add(passenger);
-            _context.SaveChanges();
+        //    _context.Passengers.Add(passenger);
+        //    _context.SaveChanges();
 
-            dto.Id = passenger.PassengerId;
-        }
+        //    dto.Id = passenger.PassengerId;
+        //}
 
         /// <summary>
         /// Бүх зорчигчийн мэдээллийн жагсаалтыг авна.

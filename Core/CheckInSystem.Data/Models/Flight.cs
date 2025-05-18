@@ -1,6 +1,6 @@
 ﻿namespace CheckInSystem.Data.Models;
 
-// Flight ангилал нь нислэгийн мэдээллийг хадгална.
+// Flight нь нислэгийн мэдээллийг хадгална.
 public class Flight
 {
     // Нислэгийн давтагдашгүй дугаар

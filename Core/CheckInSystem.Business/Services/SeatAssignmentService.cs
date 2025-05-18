@@ -51,7 +51,7 @@ public class SeatAssignmentService : ISeatAssignmentService
     public async Task<bool> AssignSeatAsync(int passengerId, int seatId)
     {
 
-        Console.WriteLine("AssignSeatAsync called with seatId: " + seatId);
+        //Console.WriteLine("AssignSeatAsync called with seatId: " + seatId);
 
         // Суудал боломжтой эсэхийг шалгана
         if (!_seatRepo.IsAvailable(seatId))
@@ -65,18 +65,24 @@ public class SeatAssignmentService : ISeatAssignmentService
             return false;
         }
 
-        int flightId = passenger.FlightId;
+        // !!! Зорчигчид суудал оноогдсон байгаа эсэхийг шалгах хэрэгтэй
 
-        // Нислэгийн бүх суудлын мэдээллийг авна
-        var allSeats = _seatRepo.GetAllSeatsByFlightId(flightId);
+        // start
+            int flightId = passenger.FlightId;
 
-        // Зорчигчид өмнө нь суудал оноосон эсэхийг шалгана
-        var existingSeat = allSeats.FirstOrDefault(s => s.PassengerId == passengerId);
-        if (existingSeat != null)
-        {
-            // Зорчигчид аль хэдийн суудал оноосон бол
-            return false;
-        }
+            // Нислэгийн бүх суудлын мэдээллийг авна
+            var allSeats = _seatRepo.GetAllSeatsByFlightId(flightId);
+
+            // Зорчигчид өмнө нь суудал оноосон эсэхийг шалгана
+            var existingSeat = allSeats.FirstOrDefault(s => s.PassengerId == passengerId);
+            if (existingSeat != null)
+            {
+                // Зорчигчид аль хэдийн суудал оноосон бол
+                return false;
+            }
+
+        //end
+
 
         // Суудал оноох үйлдлийг гүйцэтгэнэ
         var success = _seatRepo.AssignSeat(passengerId, seatId);

@@ -13,7 +13,7 @@ namespace CheckInSystem.Business.Services
         private readonly IFlightNotifier _notifier;
 
         /// <summary>
-        /// FlightStatusService-ийн бүтээгч функц.
+        /// FlightStatusService-ийн constructor функц.
         /// </summary>
         /// <param name="repo">Нислэгийн мэдээллийн сангийн репозитор</param>
         /// <param name="notifier">Нислэгийн төлөвийн мэдэгдэл дамжуулагч</param>

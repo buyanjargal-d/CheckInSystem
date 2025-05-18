@@ -11,7 +11,7 @@ public class CheckInDbContextFactory : IDesignTimeDbContextFactory<CheckInDbCont
 {
     /// <summary>
     /// CheckInDbContext-ийн шинэ жишээг үүсгэнэ.
-    /// Энэ арга нь өгөгдлийн сангийн тохиргоог (энд SQLite ашиглаж байна) тодорхойлж, контекстийг буцаана.
+    /// Энэ арга нь өгөгдлийн сангийн тохиргоог (SQLite) тодорхойлж, контекстийг буцаана.
     /// </summary>
     /// <param name="args">Аргументууд (ихэвчлэн ашиглагддаггүй).</param>
     /// <returns>CheckInDbContext-ийн шинэ жишээ.</returns>

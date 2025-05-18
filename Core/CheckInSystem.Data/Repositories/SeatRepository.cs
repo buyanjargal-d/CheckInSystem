@@ -14,7 +14,7 @@ namespace CheckInSystem.Data.Repositories
         private readonly CheckInDbContext _context;
 
         /// <summary>
-        /// SeatRepository-ийн шинэ экземплярыг үүсгэнэ.
+        /// SeatRepository-ийн үүсгэнэ.
         /// </summary>
         /// <param name="context">Өгөгдлийн сангийн контекст</param>
         public SeatRepository(CheckInDbContext context)

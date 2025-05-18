@@ -3,7 +3,7 @@
 namespace CheckInSystem.Data.Models
 {
     /// <summary>
-    /// Passenger ангилал нь зорчигчийн мэдээллийг хадгална.
+    /// Passenger нь зорчигчийн мэдээллийг хадгална.
     /// </summary>
     public class Passenger
     {
@@ -37,9 +37,9 @@ namespace CheckInSystem.Data.Models
         /// </summary>
         public Flight Flight { get; set; } = null!;
 
-        /// <summary>
-        /// Зорчигчид хуваарилагдсан суудлуудын жагсаалт.
-        /// </summary>
-        public ICollection<Seat>? Seats { get; set; }
+        ///// <summary>
+        ///// Зорчигчид хуваарилагдсан суудлуудын жагсаалт.
+        ///// </summary>
+        //public ICollection<Seat>? Seats { get; set; }
     }
 }

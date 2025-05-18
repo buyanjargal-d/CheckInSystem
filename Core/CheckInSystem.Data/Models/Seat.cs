@@ -31,12 +31,12 @@
         public Flight Flight { get; set; } = null!;
 
         /// <summary>
-        /// Энэ суудалд суусан зорчигчийн ID (байж болохгүй бол null).
+        /// Энэ суудалд суусан зорчигчийн ID (null).
         /// </summary>
         public int? PassengerId { get; set; }
 
         /// <summary>
-        /// Энэ суудалд суусан зорчигчийн мэдээлэл (байж болохгүй бол null).
+        /// Энэ суудалд суусан зорчигчийн мэдээлэл (null).
         /// </summary>
         public Passenger? Passenger { get; set; }
     }

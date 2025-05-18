@@ -64,8 +64,6 @@
             return Ok(_service.GetAllSeats(flightId));
         }
 
-        // Доорх кодыг шаардлагатай үед идэвхжүүлж ашиглана уу.
-
         //[HttpPost("lock/{seatId}")]
         //public IActionResult Lock(int seatId)
         //{
@@ -92,7 +90,7 @@
         //        PassengerId = 102
         //    };
 
-        //    Console.WriteLine("🚀 Manually invoking SignalR seat notifier...");
+        //    Console.WriteLine("Manually invoking SignalR seat notifier...");
         //    await notifier.NotifySeatAssignedAsync(seat);
         //    return Ok("Sent test seat to SignalR");
         //}

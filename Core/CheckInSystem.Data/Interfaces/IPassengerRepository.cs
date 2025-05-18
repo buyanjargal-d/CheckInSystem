@@ -30,11 +30,11 @@ namespace CheckInSystem.Data.Interfaces
         /// <param name="newStatus">Шинэ төлөв</param>
         void UpdateStatus(int passengerId, PassengerStatus newStatus);
 
-        /// <summary>
-        /// Шинэ зорчигч нэмнэ.
-        /// </summary>
-        /// <param name="dto">Зорчигчийн мэдээлэл</param>
-        void Add(PassengerDto dto);
+        ///// <summary>
+        ///// Шинэ зорчигч нэмнэ.
+        ///// </summary>
+        ///// <param name="dto">Зорчигчийн мэдээлэл</param>
+        //void Add(PassengerDto dto);
 
         /// <summary>
         /// Бүх зорчигчийн жагсаалтыг авна.
