@@ -6,7 +6,7 @@ A modular .NET-based check-in system for managing flight passenger check-ins, se
 
 # 📦 CheckIn System Project Structure
 
-## ✅ Core/ — Core Application Logic
+## Core/ — Library
 This folder holds core layers: DTOs, Data Access, and Business Logic.
 
 ### 🔹 CheckInSystem.DTO/
@@ -72,7 +72,7 @@ Interfaces and service implementations for encapsulating logic.
 
 ---
 
-## ✅ Server/ — ASP.NET Core Server App
+## Server/ — ASP.NET Core Server App
 Contains the REST API, SignalR hubs, and configuration.
 
 ### 🔹 CheckInServer.API/
@@ -112,7 +112,7 @@ Standalone TCP socket server for handling real-time seat assigning via JSON.
 
 ---
 
-## ✅ TestClient/ — Testing Clients
+## TestClient/ — Testing Clients
 Used to simulate requests and test integrations.
 
 ### 🔹 SocketTestClient/
@@ -128,7 +128,7 @@ Simple console app to send test socket messages to TCP server.
 
 ---
 
-## ✅ Usage Summary
+## Usage Summary
 
 | Component          | Purpose                                   | Test Tool         |
 |--------------------|-------------------------------------------|-------------------|
@@ -141,7 +141,7 @@ Simple console app to send test socket messages to TCP server.
 
 ## 🎯 Features
 
-### ✅ Core Functionality
+### Core Functionality
 
 | Feature                        | Description                                               |
 |-------------------------------|-----------------------------------------------------------|
@@ -157,7 +157,7 @@ Simple console app to send test socket messages to TCP server.
 # 🚀 How to Run
 ---
 
-## ✅ Prerequisites
+## Prerequisites
 
 - .NET SDK 9   
 - (Linux only) EF tools:
@@ -257,7 +257,7 @@ dotnet run --project Server/CheckInServer.API
 | `/api/flights`                               | GET    | Get all flights                     |
 | `/api/flights/status`                        | POST   | Update flight status                |
 
-✅ Make sure to open the port shown in the terminal and match it in Postman/test client.
+Make sure to open the port shown in the terminal and match it in Postman/test client.
 
 ---
 
@@ -401,7 +401,7 @@ The system uses SignalR hubs for real-time seat and flight status updates.
     });
 
     seatConnection.start().then(() => {
-        console.log("✅ Connected to SeatHub");
+        console.log("Connected to SeatHub");
     }).catch(err => console.error("❌ Error connecting:", err));
 </script>
 ```
@@ -419,7 +419,7 @@ flightConnection.on("FlightStatusChanged", (flight) => {
 });
 
 flightConnection.start().then(() => {
-    console.log("✅ Connected to FlightStatusHub");
+    console.log("Connected to FlightStatusHub");
 });
 ```
 
@@ -453,7 +453,7 @@ Tesint REST APIs, SignalR real-time updates, and TCP Socket notifications.
 
 ---
 
-## ✅ 1. Run Servers
+## 1. Run Servers
 
 Make sure all servers are running:
 
@@ -475,19 +475,19 @@ dotnet run --project Server/CheckInServer.Socket
 GET http://localhost:5052/api/passengers/JW123456
 ```
 
-**✅ Expected:** JSON with passenger info
+**Expected:** JSON with passenger info
 
 ---
 
 ## 🎟 Seat Assignment Tests
 
-### ✅ Get All Seats for a Flight
+### Get All Seats for a Flight
 
 ```http
 GET http://localhost:5052/api/seats/all?flightId=1
 ```
 
-**✅ Lists all seats with assignment and lock state**
+**Lists all seats with assignment and lock state**
 
 ### 🚑 Get Available Seats
 
@@ -495,7 +495,7 @@ GET http://localhost:5052/api/seats/all?flightId=1
 GET http://localhost:5052/api/seats/available?flightId=1
 ```
 
-**✅ Lists only unassigned and unlocked seats**
+** Lists only unassigned and unlocked seats**
 
 ### 🎯 Assign a Seat
 
@@ -512,7 +512,7 @@ POST http://localhost:5052/api/seats/assign
 }
 ```
 
-**✅ Expected:** `{ "status": "assigned" }`
+**Expected:** `{ "status": "assigned" }`
 
 **🧠 Also triggers:**
 
@@ -528,7 +528,7 @@ POST http://localhost:5052/api/seats/assign
 GET http://localhost:5052/api/flights
 ```
 
-**✅ Lists seeded flights and current statuses**
+**Lists seeded flights and current statuses**
 
 ### 🔄 Change Flight Status
 
@@ -545,7 +545,7 @@ POST http://localhost:5052/api/flights/status
 }
 ```
 
-**✅ Will broadcast update via SignalR (FlightStatusChanged) (test.html in Browser) **
+**Will broadcast update via SignalR (FlightStatusChanged) (test.html in Browser) **
 
 ---
 
@@ -557,7 +557,7 @@ POST http://localhost:5052/api/flights/status
 GET http://localhost:5052/api/passengers/boarding/JW123456
 ```
 
-**✅ JSON-style boarding pass with:**
+**JSON-style boarding pass with:**
 
 - Passenger
 - Seat
@@ -589,8 +589,8 @@ Use this HTML for real-time events:
         console.log("✈️ Flight Status Changed:", data);
     });
 
-    seatConn.start().then(() => console.log("✅ SeatHub connected"));
-    flightConn.start().then(() => console.log("✅ FlightHub connected"));
+    seatConn.start().then(() => console.log("SeatHub connected"));
+    flightConn.start().then(() => console.log("FlightHub connected"));
 </script>
 ```
 
@@ -606,7 +606,7 @@ Run this to test the raw socket client:
 dotnet run --project TestClient/SocketTestClient
 ```
 
-**✅ Should print:**
+**Should print:**
 
 ```pgsql
-✅ Response from server: ACK
+Response from server: ACK
