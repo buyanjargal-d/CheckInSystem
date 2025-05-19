@@ -14,6 +14,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContext<CheckInDbContext>(options =>
     options.UseSqlite("Data Source=checkin.db"));
 
+
 // Бизнесийн болон дата давхаргын үйлчилгээнүүдийг бүртгэнэ
 builder.Services.AddScoped<ISeatAssignmentService, SeatAssignmentService>();
 builder.Services.AddScoped<IFlightNotifier, SignalRFlightNotifier>();
@@ -27,6 +28,10 @@ builder.Services.AddScoped<IFlightStatusService, FlightStatusService>();
 // Контроллер болон SignalR-ийг бүртгэнэ
 builder.Services.AddControllers();
 builder.Services.AddSignalR();
+
+// Swagger registration
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
 
 // CORS тохиргоог бүртгэнэ (бүх origin-ийг зөвшөөрнө)
 builder.Services.AddCors(options =>
@@ -48,6 +53,10 @@ var app = builder.Build();
 app.UseRouting();
 app.UseCors(); 
 app.UseAuthorization();
+
+// Swagger middleware
+app.UseSwagger();
+app.UseSwaggerUI();
 
 // Контроллер болон SignalR hub-уудыг замчилна
 app.MapControllers();
