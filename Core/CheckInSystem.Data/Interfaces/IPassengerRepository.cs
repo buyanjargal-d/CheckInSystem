@@ -41,5 +41,8 @@ namespace CheckInSystem.Data.Interfaces
         /// </summary>
         /// <returns>Зорчигчдын жагсаалт</returns>
         List<PassengerDto> GetAll();
+
+        List<PassengerDto> GetByFlightId(int flightId);
+
     }
 }

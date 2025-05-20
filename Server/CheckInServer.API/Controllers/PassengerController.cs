@@ -98,5 +98,19 @@ namespace CheckInServer.API.Controllers
 
             return Ok(boardingPass);
         }
+
+
+        /// <summary>
+        /// Get passengers by flight ID.
+        /// </summary>
+        /// <param name="flightId">Flight ID</param>
+        /// <returns>List of passengers on that flight</returns>
+        [HttpGet("by-flight/{flightId}")]
+        public IActionResult GetByFlightId(int flightId)
+        {
+            var passengers = _repository.GetByFlightId(flightId);
+            return Ok(passengers);
+        }
+
     }
 }

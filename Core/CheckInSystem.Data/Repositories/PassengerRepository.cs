@@ -118,5 +118,20 @@ namespace CheckInSystem.Data.Repositories
                 })
                 .ToList();
         }
+
+        public List<PassengerDto> GetByFlightId(int flightId)
+        {
+            return _context.Passengers
+                .Where(p => p.FlightId == flightId)
+                .Select(p => new PassengerDto
+                {
+                    Id = p.PassengerId,
+                    FullName = p.FullName,
+                    PassportNumber = p.PassportNumber,
+                    FlightId = p.FlightId,
+                    Status = p.Status
+                }).ToList();
+        }
+
     }
 }
