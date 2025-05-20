@@ -5,6 +5,7 @@ using System.Data;
 using System.Drawing;
 using System.Linq;
 using System.Text;
+using CheckInApp.Forms; 
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
@@ -45,13 +46,13 @@ namespace CheckInApp.Forms
                 switch (role)
                 {
                     case "Clerk":
-                        new CheckInForm().Show();
+                        new FlightsForm(role).Show();
                         break;
                     case "Passenger":
-                        new CheckInForm().Show();
+                        new FlightsForm(role).Show();
                         break;
                     case "System":
-                       // new FlightStatusForm().Show(); // Нислэгийн төлөв өөрчлөх form
+                        new FlightsForm(role).Show();
                         break;
                 }
 

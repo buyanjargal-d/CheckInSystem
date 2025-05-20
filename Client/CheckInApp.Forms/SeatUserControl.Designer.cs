@@ -35,7 +35,7 @@
             // 
             btnSeat.Location = new Point(0, 0);
             btnSeat.Name = "btnSeat";
-            btnSeat.Size = new Size(33, 33);
+            btnSeat.Size = new Size(75, 75);
             btnSeat.TabIndex = 0;
             btnSeat.UseVisualStyleBackColor = true;
             // 
@@ -45,7 +45,7 @@
             AutoScaleMode = AutoScaleMode.Font;
             Controls.Add(btnSeat);
             Name = "SeatUserControl";
-            Size = new Size(39, 37);
+            Size = new Size(78, 84);
             ResumeLayout(false);
         }
 

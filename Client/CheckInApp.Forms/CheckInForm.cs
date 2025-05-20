@@ -4,6 +4,7 @@ using System.Windows.Forms;
 using System.Text;
 using CheckInSystem.DTO; // Import DTO namespace
 using CheckInApp;
+using System.ComponentModel;
 
 namespace CheckInApp.Forms;
 
@@ -17,11 +18,27 @@ public partial class CheckInForm : Form
         PropertyNameCaseInsensitive = true
     };
 
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+    public int SelectedFlightId { get; internal set; }
+
+
     public CheckInForm() => InitializeComponent();
+
 
     private async void CheckInForm_Load(object sender, EventArgs e)
     {
-        await LoadAllPassengers();
+        if (SelectedFlightId > 0)
+        {
+            await LoadPassengersByFlight(SelectedFlightId);
+            await LoadFlightStatus(SelectedFlightId);
+            await LoadSeats(SelectedFlightId);
+            await LoadSeatLayout(SelectedFlightId);
+            await LoadFlightCode(SelectedFlightId);
+        }
+        else
+        {
+            await LoadAllPassengers();
+        }
     }
 
     private async void btnSearchPassenger_Click(object sender, EventArgs e)
@@ -47,7 +64,7 @@ public partial class CheckInForm : Form
             lblPassengerFullName.Text = passenger.FullName;
             lblStatusMessage.Text = "✅ Зорчигч олдлоо";
 
-            await LoadFlights(passenger.FlightId);
+            await LoadFlightCode(passenger.FlightId);
             await LoadSeats(passenger.FlightId);
             await LoadSeatLayout(passenger.FlightId);
             await LoadFlightStatus(passenger.FlightId);
@@ -66,6 +83,33 @@ public partial class CheckInForm : Form
         dgvPassengers.DataSource = passengers;
     }
 
+    //private void FlightUserControl_Click(object sender, EventArgs e)
+    //{
+    //    var form = new CheckInForm
+    //    {
+    //        SelectedFlightId = this.FlightId
+    //    };
+    //    form.Show();
+    //}
+
+    private async Task LoadPassengersByFlight(int flightId)
+    {
+        try
+        {
+            var response = await client.GetAsync($"{baseUrl}/api/passengers/by-flight/{flightId}");
+            response.EnsureSuccessStatusCode();
+            var json = await response.Content.ReadAsStringAsync();
+            var passengers = JsonSerializer.Deserialize<List<PassengerDto>>(json, jsonOptions);
+            dgvPassengers.DataSource = passengers;
+        }
+        catch (HttpRequestException ex)
+        {
+            MessageBox.Show($"❌ Алдаа: {ex.Message}", "Татах үед алдаа гарлаа");
+        }
+    }
+
+
+
     private void dgvPassengers_CellClick(object sender, DataGridViewCellEventArgs e)
     {
         if (e.RowIndex >= 0)
@@ -76,32 +120,19 @@ public partial class CheckInForm : Form
         }
     }
 
-    private async Task LoadFlights(int selectedFlightId)
+    private async Task LoadFlightCode(int flightId)
     {
-        var json = await client.GetStringAsync($"{baseUrl}/api/flights");
-        var flights = JsonSerializer.Deserialize<List<FlightDto>>(json, jsonOptions);
-
-        if (flights == null)
+        try
         {
-            lblStatusMessage.Text = "❌ Нислэгүүд олдсонгүй";
-            return;
+            var json = await client.GetStringAsync($"{baseUrl}/api/flights/{flightId}");
+            var flight = JsonSerializer.Deserialize<FlightDto>(json, jsonOptions);
+
+            lblFlightCode.Text = flight?.FlightNumber ?? "N/A";
         }
-
-        comboFlightCode.SelectedIndexChanged -= comboFlightCode_SelectedIndexChanged;
-        comboFlightCode.DataSource = flights;
-        comboFlightCode.DisplayMember = "FlightNumber";
-        comboFlightCode.ValueMember = "Id";
-        comboFlightCode.SelectedValue = selectedFlightId;
-        comboFlightCode.SelectedIndexChanged += comboFlightCode_SelectedIndexChanged;
-    }
-
-    private async void comboFlightCode_SelectedIndexChanged(object sender, EventArgs e)
-    {
-        if (comboFlightCode.SelectedValue is int flightId)
+        catch (Exception ex)
         {
-            await LoadSeats(flightId);
-            await LoadSeatLayout(flightId);
-            await LoadFlightStatus(flightId);
+            lblFlightCode.Text = "N/A";
+            lblStatusMessage.Text = $"✖ Flight кодыг ачааллахад алдаа гарлаа: {ex.Message}";
         }
     }
 
@@ -178,7 +209,7 @@ public partial class CheckInForm : Form
         var request = new AssignSeatRequestDto
         {
             PassportNumber = txtPassportId.Text.Trim(),
-            FlightId = comboFlightCode.SelectedValue is int fid ? fid : 0,
+            FlightId = SelectedFlightId,
             SeatNumber = comboSeatSelection.SelectedValue?.ToString() ?? ""
         };
 
@@ -187,12 +218,17 @@ public partial class CheckInForm : Form
 
         var response = await client.PostAsync($"{baseUrl}/api/seats/assign", content);
 
-        lblStatusMessage.Text = response.IsSuccessStatusCode
-            ? "✅ Суудал амжилттай оноогдлоо!"
-            : "❌ Суудал оноох үед алдаа гарлаа!";
-
         if (response.IsSuccessStatusCode)
+        {
+            lblStatusMessage.Text = "✅ Суудал амжилттай оноогдлоо!";
             await LoadSeatLayout(request.FlightId);
+            btnPrintBoardingPass.PerformClick(); // автоматаар хэвлэх
+        }
+        else
+        {
+            var error = await response.Content.ReadAsStringAsync();
+            lblStatusMessage.Text = $"❌ Суудал оноох үед алдаа гарлаа: {error}";
+        }
     }
 
     private void comboSeatSelection_SelectedIndexChanged(object sender, EventArgs e)

@@ -105,10 +105,23 @@ namespace CheckInServer.API.Controllers
         /// </summary>
         /// <param name="flightId">Flight ID</param>
         /// <returns>List of passengers on that flight</returns>
+        //[HttpGet("by-flight/{flightId}")]
+        //public IActionResult GetByFlightId(int flightId)
+        //{
+        //    var passengers = _repository.GetByFlightId(flightId);
+        //    return Ok(passengers);
+        //}
+
         [HttpGet("by-flight/{flightId}")]
         public IActionResult GetByFlightId(int flightId)
         {
-            var passengers = _repository.GetByFlightId(flightId);
+            var passengers = _db.Passengers
+                .Where(p => p.FlightId == flightId)
+                .ToList();
+
+            if (passengers == null || passengers.Count == 0)
+                return NotFound();
+
             return Ok(passengers);
         }
 

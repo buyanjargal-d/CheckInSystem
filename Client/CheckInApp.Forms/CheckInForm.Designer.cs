@@ -36,7 +36,6 @@ partial class CheckInForm
         lblPassengerFullName = new Label();
         label3 = new Label();
         label4 = new Label();
-        comboFlightCode = new ComboBox();
         btnAssignSeat = new Button();
         btnPrintBoardingPass = new Button();
         label5 = new Label();
@@ -44,6 +43,7 @@ partial class CheckInForm
         lblStatusMessage = new Label();
         dgvPassengers = new DataGridView();
         flwLayoutPanelSeat = new FlowLayoutPanel();
+        lblFlightCode = new Label();
         ((System.ComponentModel.ISupportInitialize)dgvPassengers).BeginInit();
         SuspendLayout();
         // 
@@ -103,9 +103,9 @@ partial class CheckInForm
         lblPassengerFullName.Font = new Font("Segoe UI Semibold", 9F, FontStyle.Bold, GraphicsUnit.Point, 0);
         lblPassengerFullName.Location = new Point(887, 32);
         lblPassengerFullName.Name = "lblPassengerFullName";
-        lblPassengerFullName.Size = new Size(161, 20);
+        lblPassengerFullName.Size = new Size(152, 20);
         lblPassengerFullName.TabIndex = 5;
-        lblPassengerFullName.Text = "lblPassengerFullName";
+        lblPassengerFullName.Text = "Passenger Full Name";
         // 
         // label3
         // 
@@ -126,18 +126,6 @@ partial class CheckInForm
         label4.Size = new Size(42, 20);
         label4.TabIndex = 7;
         label4.Text = "Seat:";
-        // 
-        // comboFlightCode
-        // 
-        comboFlightCode.DisplayMember = "FlightNumber";
-        comboFlightCode.DropDownStyle = ComboBoxStyle.DropDownList;
-        comboFlightCode.FormattingEnabled = true;
-        comboFlightCode.Location = new Point(887, 75);
-        comboFlightCode.Name = "comboFlightCode";
-        comboFlightCode.Size = new Size(397, 28);
-        comboFlightCode.TabIndex = 8;
-        comboFlightCode.ValueMember = "Id";
-        comboFlightCode.SelectedIndexChanged += comboFlightCode_SelectedIndexChanged;
         // 
         // btnAssignSeat
         // 
@@ -177,9 +165,9 @@ partial class CheckInForm
         lblFlightStatus.Font = new Font("Segoe UI Semibold", 9F, FontStyle.Bold, GraphicsUnit.Point, 0);
         lblFlightStatus.Location = new Point(889, 480);
         lblFlightStatus.Name = "lblFlightStatus";
-        lblFlightStatus.Size = new Size(106, 20);
+        lblFlightStatus.Size = new Size(93, 20);
         lblFlightStatus.TabIndex = 12;
-        lblFlightStatus.Text = "lblFlightStatus";
+        lblFlightStatus.Text = "Flight Status";
         // 
         // lblStatusMessage
         // 
@@ -208,11 +196,22 @@ partial class CheckInForm
         flwLayoutPanelSeat.Size = new Size(550, 202);
         flwLayoutPanelSeat.TabIndex = 15;
         // 
+        // lblFlightCode
+        // 
+        lblFlightCode.AutoSize = true;
+        lblFlightCode.Font = new Font("Segoe UI Semibold", 9F, FontStyle.Bold, GraphicsUnit.Point, 0);
+        lblFlightCode.Location = new Point(889, 78);
+        lblFlightCode.Name = "lblFlightCode";
+        lblFlightCode.Size = new Size(106, 20);
+        lblFlightCode.TabIndex = 16;
+        lblFlightCode.Text = "Flight number";
+        // 
         // CheckInForm
         // 
         AutoScaleDimensions = new SizeF(8F, 20F);
         AutoScaleMode = AutoScaleMode.Font;
         ClientSize = new Size(1333, 595);
+        Controls.Add(lblFlightCode);
         Controls.Add(flwLayoutPanelSeat);
         Controls.Add(dgvPassengers);
         Controls.Add(lblStatusMessage);
@@ -220,7 +219,6 @@ partial class CheckInForm
         Controls.Add(label5);
         Controls.Add(btnPrintBoardingPass);
         Controls.Add(btnAssignSeat);
-        Controls.Add(comboFlightCode);
         Controls.Add(label4);
         Controls.Add(label3);
         Controls.Add(lblPassengerFullName);
@@ -247,7 +245,6 @@ partial class CheckInForm
     private Label lblPassengerFullName;
     private Label label3;
     private Label label4;
-    private ComboBox comboFlightCode;
     private Button btnAssignSeat;
     private Button btnPrintBoardingPass;
     private Label label5;
@@ -255,4 +252,5 @@ partial class CheckInForm
     private Label lblStatusMessage;
     private DataGridView dgvPassengers;
     private FlowLayoutPanel flwLayoutPanelSeat;
+    private Label lblFlightCode;
 }
