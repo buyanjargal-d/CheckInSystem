@@ -25,9 +25,10 @@ public class FlightDto
     public string FlightNumber { get; set; } = string.Empty;
 
     /// <summary>
-    /// Нислэгийн төлөв (FlightStatus enum төрлөөр)
+    /// Нислэгийн төлөв
     /// </summary>
-    public FlightStatus Status { get; set; } = FlightStatus.CheckingIn;
+    //public FlightStatus Status { get; set; } = FlightStatus.CheckingIn;
+    public string Status { get; set; } = "";
 
     /// <summary>
     /// Нислэгийн хөөрөх цаг (DateTime төрлөөр)
