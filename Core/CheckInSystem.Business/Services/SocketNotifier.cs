@@ -11,9 +11,15 @@ using CheckInSystem.Business.Interfaces;
 public class SocketNotifier : ISocketNotifier
 {
     // Сокет холболтын портын дугаар
-    private const int Port = 5050;
+    private readonly int _port;
     // Сокет холбогдох хостын нэр
-    private const string Host = "localhost";
+    private readonly string _host;
+
+    public SocketNotifier(string host = "localhost", int port = 5050)
+    {
+        _host = host;
+        _port = port;
+    }
 
     /// <summary>
     /// Суудал оноогдсон тухай мэдэгдэл илгээнэ.
@@ -72,7 +78,7 @@ public class SocketNotifier : ISocketNotifier
         try
         {
             // TCP клиент үүсгэж сервер рүү холбогдоно
-            using var client = new TcpClient(Host, Port);
+            using var client = new TcpClient(_host, _port);
             var stream = client.GetStream();
             // JSON өгөгдлийг UTF8 кодчиллоор хөрвүүлнэ
             var data = Encoding.UTF8.GetBytes(json);

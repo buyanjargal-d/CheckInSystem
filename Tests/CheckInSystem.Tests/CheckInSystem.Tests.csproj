@@ -21,6 +21,10 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\Core\CheckInSystem.Business\CheckInSystem.Business.csproj" />
+    <ProjectReference Include="..\..\Core\CheckInSystem.Data\CheckInSystem.Data.csproj" />
+    <ProjectReference Include="..\..\Core\CheckInSystem.DTO\CheckInSystem.DTO.csproj" />
+    <ProjectReference Include="..\..\Server\CheckInServer.API\CheckInServer.API.csproj" />
+    <ProjectReference Include="..\..\Server\CheckInServer.Socket\CheckInServer.Socket.csproj" />
   </ItemGroup>
 
 </Project>
