@@ -37,7 +37,6 @@ partial class CheckInForm
         label3 = new Label();
         label4 = new Label();
         btnAssignSeat = new Button();
-        btnPrintBoardingPass = new Button();
         label5 = new Label();
         lblFlightStatus = new Label();
         lblStatusMessage = new Label();
@@ -138,17 +137,6 @@ partial class CheckInForm
         btnAssignSeat.UseVisualStyleBackColor = false;
         btnAssignSeat.Click += btnAssignSeat_Click;
         // 
-        // btnPrintBoardingPass
-        // 
-        btnPrintBoardingPass.BackColor = Color.MediumAquamarine;
-        btnPrintBoardingPass.Location = new Point(889, 413);
-        btnPrintBoardingPass.Name = "btnPrintBoardingPass";
-        btnPrintBoardingPass.Size = new Size(96, 38);
-        btnPrintBoardingPass.TabIndex = 10;
-        btnPrintBoardingPass.Text = "Print";
-        btnPrintBoardingPass.UseVisualStyleBackColor = false;
-        btnPrintBoardingPass.Click += btnPrintBoardingPass_Click;
-        // 
         // label5
         // 
         label5.AutoSize = true;
@@ -217,7 +205,6 @@ partial class CheckInForm
         Controls.Add(lblStatusMessage);
         Controls.Add(lblFlightStatus);
         Controls.Add(label5);
-        Controls.Add(btnPrintBoardingPass);
         Controls.Add(btnAssignSeat);
         Controls.Add(label4);
         Controls.Add(label3);
@@ -246,7 +233,6 @@ partial class CheckInForm
     private Label label3;
     private Label label4;
     private Button btnAssignSeat;
-    private Button btnPrintBoardingPass;
     private Label label5;
     private Label lblFlightStatus;
     private Label lblStatusMessage;
