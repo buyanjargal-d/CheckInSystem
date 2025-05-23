@@ -44,6 +44,12 @@
             _service.UpdateStatus(dto.FlightId, dto.NewStatus);
             return Ok();
         }
+        //[HttpPost("status")]
+        //public async Task<IActionResult> UpdateStatus([FromBody] FlightStatusUpdateDto dto)
+        //{
+        //    await _service.UpdateStatus(dto.FlightId, dto.NewStatus);
+        //    return Ok();
+        //}
 
         /// <summary>
         /// Бүх нислэгийн жагсаалтыг авах API.
@@ -52,9 +58,18 @@
         [HttpGet]
         public IActionResult GetAllFlights()
         {
-            var flights = _db.Flights.ToList();
-            return Ok(flights);
+            try
+            {
+                var flights = _db.Flights.ToList();
+                return Ok(flights);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($" Flights error: {ex.Message}");
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
         }
+
 
         /// <summary>
         /// Нислэгийн ID-аар нислэгийн дэлгэрэнгүй мэдээлэл авах API.

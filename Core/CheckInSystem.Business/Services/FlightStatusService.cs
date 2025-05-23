@@ -28,12 +28,18 @@ namespace CheckInSystem.Business.Services
         /// </summary>
         /// <param name="flightId">Нислэгийн давтагдашгүй дугаар</param>
         /// <param name="newStatus">Шинэ төлөв</param>
-        public void UpdateStatus(int flightId, string newStatus)
+        public async Task UpdateStatus(int flightId, string newStatus)
         {
-            // Нислэгийн төлөвийг мэдээллийн санд шинэчилнэ
             _repo.UpdateStatus(flightId, newStatus);
-            // Шинэ төлөвийг асинхрон байдлаар мэдэгдэнэ
-            _notifier.NotifyFlightStatusAsync(flightId, newStatus);
+            await _notifier.NotifyFlightStatusAsync(flightId, newStatus); // Awaited
         }
+        //public void UpdateStatus(int flightId, string newStatus)
+        //{
+        //    // Нислэгийн төлөвийг мэдээллийн санд шинэчилнэ
+        //    _repo.UpdateStatus(flightId, newStatus);
+        //    // Шинэ төлөвийг асинхрон байдлаар мэдэгдэнэ
+        //    _notifier.NotifyFlightStatusAsync(flightId, newStatus);
+        //}
+
     }
 }
