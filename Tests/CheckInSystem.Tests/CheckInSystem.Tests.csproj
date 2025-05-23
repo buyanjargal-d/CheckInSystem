@@ -9,6 +9,7 @@
 
   <ItemGroup>
     <PackageReference Include="coverlet.collector" Version="6.0.2" />
+    <PackageReference Include="Microsoft.AspNetCore.SignalR.Client" Version="9.0.5" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.12.0" />
     <PackageReference Include="Moq" Version="4.20.72" />
     <PackageReference Include="xunit" Version="2.9.2" />
@@ -21,6 +22,10 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\Core\CheckInSystem.Business\CheckInSystem.Business.csproj" />
+    <ProjectReference Include="..\..\Core\CheckInSystem.Data\CheckInSystem.Data.csproj" />
+    <ProjectReference Include="..\..\Core\CheckInSystem.DTO\CheckInSystem.DTO.csproj" />
+    <ProjectReference Include="..\..\Server\CheckInServer.API\CheckInServer.API.csproj" />
+    <ProjectReference Include="..\..\Server\CheckInServer.Socket\CheckInServer.Socket.csproj" />
   </ItemGroup>
 
 </Project>
