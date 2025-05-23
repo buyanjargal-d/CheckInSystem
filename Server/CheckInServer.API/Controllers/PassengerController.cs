@@ -112,18 +112,53 @@ namespace CheckInServer.API.Controllers
         //    return Ok(passengers);
         //}
 
+        //[HttpGet]
+        //public IActionResult GetAllPassengers()
+        //{
+        //    var passengers = _db.Passengers
+        //        .Select(p => new PassengerDto
+        //        {
+        //            Id = p.PassengerId,                          
+        //            FullName = p.FullName,
+        //            PassportNumber = p.PassportNumber,
+        //            FlightId = p.FlightId,
+        //            Status = p.Status
+        //        }).ToList();
+
+        //    return Ok(passengers);
+        //}
+
         [HttpGet("by-flight/{flightId}")]
-        public IActionResult GetByFlightId(int flightId)
+        public IActionResult GetPassengersByFlight(int flightId)
         {
             var passengers = _db.Passengers
                 .Where(p => p.FlightId == flightId)
+                .Select(p => new PassengerDto
+                {
+                    Id = p.PassengerId,
+                    FullName = p.FullName,
+                    PassportNumber = p.PassportNumber,
+                    FlightId = p.FlightId,
+                    Status = p.Status
+                })
                 .ToList();
-
-            if (passengers == null || passengers.Count == 0)
-                return NotFound();
 
             return Ok(passengers);
         }
+
+
+        //[HttpGet("by-flight/{flightId}")]
+        //public IActionResult GetByFlightId(int flightId)
+        //{
+        //    var passengers = _db.Passengers
+        //        .Where(p => p.FlightId == flightId)
+        //        .ToList();
+
+        //    if (passengers == null || passengers.Count == 0)
+        //        return NotFound();
+
+        //    return Ok(passengers);
+        //}
 
     }
 }

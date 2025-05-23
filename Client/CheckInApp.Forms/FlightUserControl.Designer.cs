@@ -90,14 +90,13 @@
             // 
             AutoScaleDimensions = new SizeF(8F, 20F);
             AutoScaleMode = AutoScaleMode.Font;
-            BorderStyle = BorderStyle.Fixed3D;
             Controls.Add(btnStatus);
             Controls.Add(pictureBox1);
             Controls.Add(lblStatus);
             Controls.Add(lblDepartureTime);
             Controls.Add(lblFlightNumber);
             Name = "FlightUserControl";
-            Size = new Size(381, 103);
+            Size = new Size(385, 107);
             ((System.ComponentModel.ISupportInitialize)pictureBox1).EndInit();
             ResumeLayout(false);
             PerformLayout();

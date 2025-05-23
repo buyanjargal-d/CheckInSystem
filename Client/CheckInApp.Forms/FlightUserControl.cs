@@ -33,7 +33,9 @@ namespace CheckInApp.Forms
 
         private void BtnStatus_Click(object sender, EventArgs e)
         {
-            MessageBox.Show($"Төлөв: {lblStatus.Text}\nFlight ID: {FlightId}", "Flight Status");
+            // Шинээр StatusForm үүсгэх ба FlightId-г дамжуулах
+            var statusForm = new StatusForm(FlightId);
+            statusForm.Show();
         }
 
         private void FlightUserControl_Click(object sender, EventArgs e)
