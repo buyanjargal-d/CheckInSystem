@@ -29,10 +29,23 @@ public class SignalRFlightNotifier : IFlightNotifier
     /// <param name="status">Нислэгийн шинэ төлөв</param>
     public async Task NotifyFlightStatusAsync(int flightId, string status)
     {
-        await _hub.Clients.All.SendAsync("FlightStatusChanged", new
+        try
         {
-            FlightId = flightId,
-            Status = status
-        });
+            Console.WriteLine($"SignalR: Sending notification for flight {flightId} with status {status}");
+
+            var message = new
+            {
+                FlightId = flightId,
+                Status = status
+            };
+
+            await _hub.Clients.All.SendAsync("FlightStatusChanged", message);
+            Console.WriteLine($"SignalR: Successfully sent notification for flight {flightId}");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"SignalR Error: {ex.Message}");
+            throw;
+        }
     }
 }
