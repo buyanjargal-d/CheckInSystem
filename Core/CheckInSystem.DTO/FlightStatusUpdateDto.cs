@@ -4,6 +4,8 @@ using System.Linq;
 using System.Text;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
+using System.Text.Json.Serialization;
+
 
 namespace CheckInSystem.DTO;
 
@@ -16,8 +18,6 @@ public class FlightStatusUpdateDto
     public int FlightId { get; set; }
 
     // NewStatus нь нислэгийн шинэ төлөвийг илэрхийлнэ.
-
-    [JsonPropertyName("newStatus")]
     public string NewStatus { get; set; } = string.Empty;
 }
 

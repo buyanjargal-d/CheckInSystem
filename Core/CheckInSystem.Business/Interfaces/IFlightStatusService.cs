@@ -17,6 +17,7 @@ namespace CheckInSystem.Business.Interfaces
         /// </summary>
         /// <param name="flightId">Нислэгийн давтагдашгүй дугаар</param>
         /// <param name="newStatus">Шинэ төлөв</param>
-        void UpdateStatus(int flightId, string newStatus);
+        Task UpdateStatus(int flightId, string newStatus);
+        //void UpdateStatus(int flightId, string newStatus);
     }
 }

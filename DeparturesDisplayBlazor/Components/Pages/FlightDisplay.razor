@@ -1,0 +1,93 @@
+﻿@page "/flights"
+@using Microsoft.AspNetCore.SignalR.Client
+@using System.Text.Json;
+@using CheckInSystem.DTO
+@inject HttpClient Http
+@implements IAsyncDisposable
+
+<h3>✈️ Нислэгийн төлөв</h3>
+
+@if (flights.Count == 0)
+{
+    <p>Одоогоор нислэгийн мэдээлэл алга байна.</p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>№</th>
+                <th>Нислэг</th>
+                <th>Төлөв</th>
+                <th>Цаг</th>
+            </tr>
+        </thead>
+        <tbody>
+        @foreach (var flight in flights)
+        {
+            <tr>
+                <td>@flight.Id</td>
+                <td>@flight.FlightNumber</td>
+                <td>@flight.Status</td>
+                <td>@flight.DepartureTime.ToString("yyyy-MM-dd HH:mm")</td>
+            </tr>
+        }
+        </tbody>
+    </table>
+}
+
+@code {
+    private HubConnection? connection;
+    private List<FlightDto> flights = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        // 🛬 Нислэгийн жагсаалтыг ачааллах
+        var result = await Http.GetFromJsonAsync<List<FlightDto>>("http://localhost:5052/api/flights");
+        if (result != null)
+            flights = result;
+
+        // 🔔 SignalR холболтыг үүсгэх
+        connection = new HubConnectionBuilder()
+            .WithUrl("http://localhost:5052/hub/flight-status")
+            .WithAutomaticReconnect()
+            .Build();
+
+        // ✈️ Нислэгийн төлөв өөрчлөгдөх үед хүлээн авах
+        connection.On<object>("FlightStatusChanged", async data =>
+        {
+            var json = JsonSerializer.Serialize(data);
+            Console.WriteLine($" Raw SignalR JSON: {json}");
+
+            var update = JsonSerializer.Deserialize<FlightStatusUpdateDto>(
+                json,
+                new JsonSerializerOptions { PropertyNameCaseInsensitive = true }
+            );
+
+            if (update != null)
+            {
+                Console.WriteLine($"Realtime update: FlightId={update.FlightId}, Status={update.NewStatus}");
+
+                var flight = flights.FirstOrDefault(f => f.Id == update.FlightId);
+                if (flight != null)
+                {
+                    flight.Status = update.NewStatus;
+                    await InvokeAsync(StateHasChanged);
+                }
+            }
+            else
+            {
+                Console.WriteLine(" Could not parse incoming update.");
+            }
+        });
+
+        await connection.StartAsync();
+        Console.WriteLine(" SignalR холболт амжилттай");
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        if (connection is not null)
+            await connection.DisposeAsync();
+    }
+}
