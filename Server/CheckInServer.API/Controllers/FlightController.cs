@@ -39,17 +39,21 @@
         /// <param name="dto">Нислэгийн төлөв шинэчлэх DTO объект.</param>
         /// <returns>Амжилттай бол 200 OK хариу буцаана.</returns>
         [HttpPost("status")]
-        public IActionResult UpdateStatus([FromBody] FlightStatusUpdateDto dto)
+        public async Task<IActionResult> UpdateStatus([FromBody] FlightStatusUpdateDto dto)
         {
-            _service.UpdateStatus(dto.FlightId, dto.NewStatus);
-            return Ok();
+            try
+            {
+                Console.WriteLine($"API: Updating flight {dto.FlightId} to status {dto.NewStatus}");
+                await _service.UpdateStatus(dto.FlightId, dto.NewStatus);
+                Console.WriteLine($"API: Successfully updated flight {dto.FlightId}");
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"API Error: {ex.Message}");
+                return StatusCode(500, $"Error updating flight status: {ex.Message}");
+            }
         }
-        //[HttpPost("status")]
-        //public async Task<IActionResult> UpdateStatus([FromBody] FlightStatusUpdateDto dto)
-        //{
-        //    await _service.UpdateStatus(dto.FlightId, dto.NewStatus);
-        //    return Ok();
-        //}
 
         /// <summary>
         /// Бүх нислэгийн жагсаалтыг авах API.
@@ -65,11 +69,10 @@
             }
             catch (Exception ex)
             {
-                Console.WriteLine($" Flights error: {ex.Message}");
+                Console.WriteLine($"Flights error: {ex.Message}");
                 return StatusCode(500, $"Internal server error: {ex.Message}");
             }
         }
-
 
         /// <summary>
         /// Нислэгийн ID-аар нислэгийн дэлгэрэнгүй мэдээлэл авах API.
@@ -82,7 +85,6 @@
             var flight = _db.Flights.FirstOrDefault(f => f.Id == id);
             if (flight == null)
                 return NotFound();
-
             return Ok(flight);
         }
     }
