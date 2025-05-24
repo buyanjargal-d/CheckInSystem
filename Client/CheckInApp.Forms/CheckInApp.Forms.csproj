@@ -27,4 +27,8 @@
     </EmbeddedResource>
   </ItemGroup>
 
+  <ItemGroup>
+    <PackageReference Include="ZXing.Net" Version="0.16.10" />
+  </ItemGroup>
+
 </Project>

@@ -1,12 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Drawing;
+using System.Drawing.Printing;
+using System.Linq;
 using System.Net.Http;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using ZXing;
+using ZXing.Common;
 using CheckInSystem.DTO;
 
 namespace CheckInApp.Forms
@@ -229,6 +234,99 @@ namespace CheckInApp.Forms
                     lblStatusMessage.Text = "Суудал амжилттай оноогдлоо!";
                     await LoadSeats(SelectedFlightId);
                     await LoadSeatLayout(SelectedFlightId);
+                    try
+                    {
+                        var bpJson = await client.GetStringAsync(
+                            $"{baseUrl}/api/passengers/boarding-pass/{Uri.EscapeDataString(passportId)}");
+                        var bp = JsonSerializer.Deserialize<BoardingPassDto>(bpJson, jsonOptions);
+
+                        var doc = new PrintDocument();
+                        doc.DefaultPageSettings.PaperSize = new PaperSize("BoardingPass", 413, 583);
+                        doc.DefaultPageSettings.Margins = new Margins(30, 30, 30, 30);
+                        doc.PrintPage += (s, ev) =>
+                        {
+                            var g = ev.Graphics;
+                            var r = ev.MarginBounds;
+
+                            using var pen = new Pen(Color.Black, 2);
+                            g.DrawRectangle(pen, r);
+
+                            var header = new Rectangle(r.X, r.Y, r.Width, 60);
+                            using var hdrBrush = new SolidBrush(Color.LightGray);
+                            g.FillRectangle(hdrBrush, header);
+                            using var hdrFont = new Font("Arial", 18, FontStyle.Bold);
+                            var title = "BOARDING PASS";
+                            var titleWidth = g.MeasureString(title, hdrFont).Width;
+                            g.DrawString(
+                                title,
+                                hdrFont,
+                                Brushes.Black,
+                                r.X + (r.Width - titleWidth) / 2,
+                                r.Y + 15);
+
+                            g.DrawLine(Pens.Black, r.X, r.Y + 60, r.Right, r.Y + 60);
+
+                            using var lblFont = new Font("Arial", 12, FontStyle.Bold);
+                            using var valFont = new Font("Arial", 12);
+                            float x = r.X + 10;
+                            float y = r.Y + 80;
+                            float lineHeight = valFont.GetHeight(g) + 6;
+
+                            void DrawRow(string label, string value)
+                            {
+                                g.DrawString(label, lblFont, Brushes.Black, x, y);
+                                g.DrawString(value, valFont, Brushes.Black, x + 120, y);
+                                y += lineHeight;
+                            }
+
+                            DrawRow("Passenger:", bp.FullName);
+                            DrawRow("Passport No:", bp.PassportNumber);
+                            DrawRow("Flight No:", bp.FlightNumber);
+                            DrawRow("Status:", bp.FlightStatus);
+                            DrawRow("Seat:", bp.SeatNumber);
+                            DrawRow("Departure:", bp.DepartureTime);
+
+                            var pixelWriter = new BarcodeWriterPixelData
+                            {
+                                Format = BarcodeFormat.CODE_128,
+                                Options = new EncodingOptions
+                                {
+                                    Width = r.Width - 20,
+                                    Height = 60,
+                                    Margin = 2
+                                }
+                            };
+                            var pixelData = pixelWriter.Write(bp.PassportNumber);
+                            using var bmp = new Bitmap(
+                                pixelData.Width,
+                                pixelData.Height,
+                                System.Drawing.Imaging.PixelFormat.Format32bppRgb);
+                            var bmpData = bmp.LockBits(
+                                new Rectangle(0, 0, bmp.Width, bmp.Height),
+                                System.Drawing.Imaging.ImageLockMode.WriteOnly,
+                                System.Drawing.Imaging.PixelFormat.Format32bppRgb);
+                            System.Runtime.InteropServices.Marshal.Copy(
+                                pixelData.Pixels, 0, bmpData.Scan0, pixelData.Pixels.Length);
+                            bmp.UnlockBits(bmpData);
+                            g.DrawImage(bmp, r.X + 10, r.Bottom - 80);
+                        };
+
+                        using var preview = new PrintPreviewDialog
+                        {
+                            Document = doc,
+                            Width = 800,
+                            Height = 600
+                        };
+                        preview.ShowDialog();
+                    }
+                    catch (HttpRequestException ex) when (ex.Message.Contains("404"))
+                    {
+                        MessageBox.Show(
+                            "Боард пас олдсонгүй.",
+                            "Анхааруулга",
+                            MessageBoxButtons.OK,
+                            MessageBoxIcon.Warning);
+                    }
                     break;
                 case "passenger_already_assigned":
                     lblStatusMessage.Text = apiResult.Message ?? "Зорчигчийн суудал аль хэдийнээ оноогдсон байна";
