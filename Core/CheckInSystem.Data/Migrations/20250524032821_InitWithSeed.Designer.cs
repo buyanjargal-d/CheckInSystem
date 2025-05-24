@@ -11,8 +11,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CheckInSystem.Data.Migrations
 {
     [DbContext(typeof(CheckInDbContext))]
-    [Migration("20250521110021_InitWithFullSeed")]
-    partial class InitWithFullSeed
+    [Migration("20250524032821_InitWithSeed")]
+    partial class InitWithSeed
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

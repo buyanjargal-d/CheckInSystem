@@ -43,7 +43,7 @@ namespace CheckInApp.Forms
             var passportId = txtPassportId.Text.Trim();
             if (string.IsNullOrWhiteSpace(passportId))
             {
-                lblStatusMessage.Text = "❗ Пасспортын дугаар оруулна уу";
+                lblStatusMessage.Text = "Пасспортын дугаар оруулна уу";
                 return;
             }
 
@@ -54,12 +54,12 @@ namespace CheckInApp.Forms
 
                 if (passenger == null)
                 {
-                    lblStatusMessage.Text = "❌ Зорчигч олдсонгүй";
+                    lblStatusMessage.Text = "Зорчигч олдсонгүй";
                     return;
                 }
 
                 lblPassengerFullName.Text = passenger.FullName;
-                lblStatusMessage.Text = "✅ Зорчигч олдлоо";
+                lblStatusMessage.Text = "Зорчигч олдлоо";
 
                 SelectedFlightId = passenger.FlightId;
                 await LoadFlightCode(passenger.FlightId);
@@ -69,7 +69,7 @@ namespace CheckInApp.Forms
             }
             catch (Exception ex)
             {
-                lblStatusMessage.Text = $"❌ Алдаа гарлаа: {ex.Message}";
+                lblStatusMessage.Text = $"Алдаа гарлаа: {ex.Message}";
             }
         }
 
@@ -93,7 +93,7 @@ namespace CheckInApp.Forms
             }
             catch (HttpRequestException ex)
             {
-                MessageBox.Show($"❌ Алдаа: {ex.Message}", "Татах үед алдаа гарлаа");
+                MessageBox.Show($"Алдаа: {ex.Message}", "Татах үед алдаа гарлаа");
             }
         }
 
@@ -183,7 +183,7 @@ namespace CheckInApp.Forms
 
             if (string.IsNullOrWhiteSpace(passportId) || string.IsNullOrWhiteSpace(seat))
             {
-                lblStatusMessage.Text = "❗ Пасспорт эсвэл суудал сонгоно уу";
+                lblStatusMessage.Text = "Пасспорт эсвэл суудал сонгоно уу";
                 return;
             }
 
@@ -192,7 +192,7 @@ namespace CheckInApp.Forms
 
             if (passenger == null || passenger.Id == 0)
             {
-                lblStatusMessage.Text = "❌ Зорчигчийн ID олдсонгүй!";
+                lblStatusMessage.Text = "Зорчигчийн ID олдсонгүй!";
                 return;
             }
 
@@ -210,14 +210,14 @@ namespace CheckInApp.Forms
 
             if (response.IsSuccessStatusCode)
             {
-                lblStatusMessage.Text = "✅ Суудал амжилттай оноогдлоо!";
+                lblStatusMessage.Text = "Суудал амжилттай оноогдлоо!";
                 await LoadSeatLayout(request.FlightId);
             }
             else
             {
                 lblStatusMessage.Text = result.Contains("seat_taken")
-                    ? "❌ Энэ суудал аль хэдийнээ эзэлсэн байна. Өөр суудал сонгоно уу!"
-                    : $"❌ Алдаа гарлаа: {result}";
+                    ? "Энэ суудал аль хэдийнээ эзэлсэн байна. Өөр суудал сонгоно уу!"
+                    : $"Алдаа гарлаа: {result}";
             }
         }
 

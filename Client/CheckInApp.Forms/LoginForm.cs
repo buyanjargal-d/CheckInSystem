@@ -33,14 +33,14 @@ namespace CheckInApp.Forms
 
             if (string.IsNullOrWhiteSpace(role) || string.IsNullOrWhiteSpace(password))
             {
-                MessageBox.Show("⛔ Role болон Password-ийг бөглөнө үү", "Анхааруулга");
+                MessageBox.Show("Role болон Password-ийг бөглөнө үү", "Анхааруулга");
                 return;
             }
 
             // Жишээ хэрэглэгчийн мэдээлэл (энэ хэсгийг хүсвэл DB-р холбож болно)
             if (IsValidLogin(role, password))
             {
-                MessageBox.Show("✅ Нэвтрэлт амжилттай!", "Login");
+                MessageBox.Show("Нэвтрэлт амжилттай!", "Login");
 
                 // Тохирох form-ыг нээж, энэ LoginForm-ыг хаах
                 switch (role)
@@ -60,7 +60,7 @@ namespace CheckInApp.Forms
             }
             else
             {
-                MessageBox.Show("❌ Нууц үг буруу байна!", "Login error");
+                MessageBox.Show(" Нууц үг буруу байна!", "Login error");
             }
         }
 

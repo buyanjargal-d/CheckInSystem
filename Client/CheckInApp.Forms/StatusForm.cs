@@ -120,12 +120,12 @@ namespace CheckInApp.Forms
 
             if (response.IsSuccessStatusCode)
             {
-                MessageBox.Show("🛫 Төлөв амжилттай шинэчлэгдлээ!");
+                MessageBox.Show("Төлөв амжилттай шинэчлэгдлээ!");
                 await LoadFlights(txtFlightNumber.Text.Trim()); // update grid
             }
             else
             {
-                MessageBox.Show("❌ Төлөв шинэчлэх үед алдаа гарлаа!");
+                MessageBox.Show("Төлөв шинэчлэх үед алдаа гарлаа!");
             }
         }
     }

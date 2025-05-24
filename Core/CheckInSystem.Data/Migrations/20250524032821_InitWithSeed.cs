@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace CheckInSystem.Data.Migrations
 {
     /// <inheritdoc />
-    public partial class InitWithFullSeed : Migration
+    public partial class InitWithSeed : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
