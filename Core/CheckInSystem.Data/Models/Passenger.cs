@@ -32,10 +32,10 @@ namespace CheckInSystem.Data.Models
         /// </summary>
         public PassengerStatus Status { get; set; }
 
-        /// <summary>
-        /// Зорчигчийн харьяалагдах нислэгийн мэдээлэл.
-        /// </summary>
-        public Flight Flight { get; set; } = null!;
+        ///// <summary>
+        ///// Зорчигчийн харьяалагдах нислэгийн мэдээлэл.
+        ///// </summary>
+        //public Flight Flight { get; set; } = null!;
 
         ///// <summary>
         ///// Зорчигчид хуваарилагдсан суудлуудын жагсаалт.

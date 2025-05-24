@@ -87,5 +87,14 @@
                 return NotFound();
             return Ok(flight);
         }
+        [HttpGet("search")]
+        public IActionResult SearchByNumber([FromQuery] string number)
+        {
+            var results = _db.Flights
+                .Where(f => f.FlightNumber.Contains(number))
+                .ToList();
+
+            return Ok(results);
+        }
     }
 }
