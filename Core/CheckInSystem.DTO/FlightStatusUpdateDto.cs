@@ -15,7 +15,7 @@ public class FlightStatusUpdateDto
     public int FlightId { get; set; }
 
     // NewStatus нь нислэгийн шинэ төлөвийг илэрхийлнэ.
-    //[JsonPropertyName("status")]
+    [JsonPropertyName("status")]
     public string NewStatus { get; set; } = string.Empty;
 }
 

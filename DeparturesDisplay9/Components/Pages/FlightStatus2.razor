@@ -1,0 +1,228 @@
+﻿@rendermode InteractiveServer
+@page "/flights2"
+@using Microsoft.AspNetCore.SignalR.Client
+@using System.Text.Json;
+@using CheckInSystem.DTO
+@inject HttpClient Http
+@inject IJSRuntime JS
+@implements IAsyncDisposable
+
+<style>
+    body {
+        background-color: #e0f0ff;
+    }
+
+    h3 {
+        color: #264a80;
+        padding: 10px;
+        border-radius: 4px;
+    }
+    p {
+        color: #264a80;
+        padding: 10px;
+        border-radius: 4px;
+    }
+
+    .departure-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 20px;
+    }
+
+    .departure-table thead {
+        background-color: #b0a705;
+        color: #003366;
+    }
+
+    .departure-table tbody tr:nth-child(odd) {
+        background-color: #003366 !important;
+        color: white !important;
+    }
+
+    .departure-table tbody tr:nth-child(even) {
+        background-color: #002244 !important;
+        color: white !important;
+    }
+
+    .departure-table th {
+        border: none !important;
+        text-align: center;
+        padding: 12px;
+        font-size: 1.1rem;
+    }
+
+    .departure-table td {
+        padding: 12px;
+        font-size: 1.1rem;
+        text-align: center;
+    }
+
+    .badge {
+        font-size: 1em;
+        padding: 0.5em 0.8em;
+    }
+</style>
+
+<div class="d-flex justify-content-end mb-3">
+    <button class="btn btn-outline-primary" @onclick="ToggleLanguage">
+        @(isMongolian ? "🇺🇸 US" : "🇲🇳 MN")
+    </button>
+</div>
+
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h3 class="m-0">@(isMongolian ? "✈️ Нислэгийн мэдээлэл" : "✈️ Departures")</h3>
+    <h3 class="m-0">@DateTime.Now.ToString("dd/MM/yyyy HH:mm")</h3>
+</div>
+
+@if (flights.Count == 0)
+{
+        <p class="text-center">@(isMongolian ? "Нислэгийн мэдээлэл алга байна." : "No flight data available.")</p>
+}
+else
+{
+        <table class="departure-table">
+            <thead>
+                <tr>
+                    <th>@(isMongolian ? "Нислэгийн дугаар" : "Flight No.")</th>
+                    <th>@(isMongolian ? "Цаг" : "ETD")</th>
+                    <th>@(isMongolian ? "Төлөв" : "Status")</th>
+                </tr>
+            </thead>
+            <tbody>
+            @foreach (var flight in flights)
+            {
+                        <tr>
+                            <td>@flight.FlightNumber</td>
+                            <td>@flight.DepartureTime.ToString("HH:mm")</td>
+                            <td>
+                                <span class="badge bg-@GetStatusBadgeClass(flight.Status)">
+                            @TranslateStatus(flight.Status)
+                                </span>
+                            </td>
+                        </tr>
+            }
+            </tbody>
+        </table>
+}
+
+@code {
+    private HubConnection? connection;
+    private List<FlightDto> flights = new();
+    private readonly string componentId = Guid.NewGuid().ToString("N")[..8];
+    private bool isMongolian = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        Console.WriteLine($"[{componentId}] Initializing...");
+
+        try
+        {
+            var result = await Http.GetFromJsonAsync<List<FlightDto>>("http://localhost:5052/api/flights");
+            if (result != null)
+            {
+                flights = result;
+                Console.WriteLine($"[{componentId}] Loaded {flights.Count} flights");
+            }
+
+            await SetupSignalRConnection();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"[{componentId}] Error: {ex.Message}");
+        }
+    }
+
+    private async Task SetupSignalRConnection()
+    {
+        try
+        {
+            Console.WriteLine($"[{componentId}] Setting up SignalR connection...");
+            connection = new HubConnectionBuilder()
+                .WithUrl("http://localhost:5052/hub/flight-status")
+                .WithAutomaticReconnect()
+                .Build();
+
+            connection.On<object>("FlightStatusChanged", async data =>
+            {
+                try
+                {
+                    var json = JsonSerializer.Serialize(data);
+                    Console.WriteLine($"[{componentId}] SignalR message: {json}");
+
+                    var update = JsonSerializer.Deserialize<FlightStatusUpdateDto>(
+                        json,
+                        new JsonSerializerOptions { PropertyNameCaseInsensitive = true }
+                    );
+
+                    if (update != null)
+                    {
+                        var flight = flights.FirstOrDefault(f => f.Id == update.FlightId);
+                        if (flight != null)
+                        {
+                            flight.Status = update.NewStatus;
+                            await InvokeAsync(StateHasChanged);
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"[{componentId}] Error handling SignalR message: {ex.Message}");
+                }
+            });
+
+            await connection.StartAsync();
+            Console.WriteLine($"[{componentId}] SignalR connected. State: {connection.State}");
+
+            await InvokeAsync(StateHasChanged);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"[{componentId}] SignalR setup error: {ex.Message}");
+        }
+    }
+
+    private string GetStatusBadgeClass(string status)
+    {
+        return status switch
+        {
+            "CheckingIn" => "warning",
+            "Departed" => "success",
+            "Boarding" => "info",
+            "Security" => "primary",
+            "On Time" => "warning",
+            "Cancelled" => "danger",
+            _ => "dark"
+        };
+    }
+
+    private string TranslateStatus(string status)
+    {
+        if (!isMongolian) return status;
+ 
+        return status switch
+        {
+            "CheckingIn" => "Бүртгэж байна",
+            "Departed" => "Нислэг хөөрсөн",
+            "Boarding" => "Суудал эзэлж байна",
+            "Security" => "Хяналт",
+            "On Time" => "Цагтаа",
+            "Cancelled" => "Цуцлагдсан",
+            _ => status
+        };
+    }
+
+    private void ToggleLanguage()
+    {
+        isMongolian = !isMongolian;
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        Console.WriteLine($"[{componentId}] Disposing component...");
+        if (connection is not null)
+        {
+            await connection.DisposeAsync();
+        }
+    }
+}

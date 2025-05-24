@@ -1,0 +1,324 @@
+﻿@rendermode InteractiveServer
+@page "/flights"
+@using Microsoft.AspNetCore.SignalR.Client
+@using System.Text.Json;
+@using CheckInSystem.DTO
+@inject HttpClient Http
+@inject IJSRuntime JS
+@implements IAsyncDisposable
+
+<h3>✈️ Нислэгийн төлөв</h3>
+
+<!-- Connection Status Debug Info -->
+@* <div class="alert alert-info mb-3"> *@
+@*     <strong>🔌 SignalR Status:</strong>  *@
+@*     <span class="badge badge-@(GetConnectionStatusClass())"> *@
+@*         @(connection?.State.ToString() ?? "Not Connected") *@
+@*     </span> *@
+@*     <br/> *@
+@*     <small>Component ID: @componentId</small> *@
+@* </div> *@
+
+<!-- Status Change Test Section -->
+<div class="card mb-4">
+    <div class="card-header">
+        <h5>🧪 Төлөв өөрчлөх тест</h5>
+    </div>
+    <div class="card-body">
+    <div class="row">
+        <div class="col-md-3">
+            <label>Нислэгийн ID:</label>
+            <input @bind="testFlightId" type="number" class="form-control" placeholder="1" />
+        </div>
+
+        <div class="col-md-3">
+            <label>Шинэ төлөв:</label>
+            <select @bind="testNewStatus" class="form-control">
+                <option value="">-- Сонгох --</option>
+                <option value="CheckingIn">CheckingIn</option>
+                <option value="Boarding">Boarding</option>
+                <option value="Departed">Departed</option>
+                <option value="Cancelled">Cancelled</option>
+            </select>
+        </div>
+
+        <div class="col-md-3">
+            <label>&nbsp;</label>
+            <button type="button" class="btn btn-primary form-control" @onclick="ChangeStatusAsync" disabled="@isUpdating">
+                    @if (isUpdating)
+                    {
+                        <span>⏳ Шинэчилж байна...</span>
+                    }
+                    else
+                    {
+                        <span>🔄 Төлөв өөрчлөх</span>
+                    }
+            </button>
+        </div>
+
+    </div>
+
+    
+</div>
+
+</div>
+
+@if (flights.Count == 0)
+{
+            <p>Одоогоор нислэгийн мэдээлэл алга байна.</p>
+}
+else
+{
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>№</th>
+                        <th>Нислэг</th>
+                        <th>Төлөв</th>
+                        <th>Цаг</th>
+                      
+                    </tr>
+                </thead>
+                <tbody>
+            @foreach (var flight in flights)
+            {
+                            <tr>
+                                <td>@flight.Id</td>
+                                <td>@flight.FlightNumber</td>
+                                <td>
+                                            <span class="badge bg-@GetStatusBadgeClass(flight.Status)">
+                            @flight.Status
+        </span>
+
+                                </td>
+                                <td>@flight.DepartureTime.ToString("yyyy-MM-dd HH:mm")</td>
+                              
+                            </tr>
+            }
+                </tbody>
+            </table>
+}
+
+@code {
+    private HubConnection? connection;
+    private List<FlightDto> flights = new();
+    private readonly string componentId = Guid.NewGuid().ToString("N")[..8];
+
+    // Test variables
+    private int testFlightId = 1;
+    private string testNewStatus = "";
+    private bool isUpdating = false;
+    private string testMessage = "";
+
+    protected override async Task OnInitializedAsync()
+    {
+        Console.WriteLine($"🏗️ Component {componentId} OnInitializedAsync started");
+
+        try
+        {
+            // 🛬 Нислэгийн жагсаалтыг ачааллах
+            Console.WriteLine($"[{componentId}] Loading flights from API...");
+            var result = await Http.GetFromJsonAsync<List<FlightDto>>("http://localhost:5052/api/flights");
+            if (result != null)
+            {
+                flights = result;
+                Console.WriteLine($"[{componentId}] Loaded {flights.Count} flights");
+            }
+
+            await SetupSignalRConnection();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"❌ [{componentId}] Error in OnInitializedAsync: {ex.Message}");
+        }
+    }
+
+    private async Task SetupSignalRConnection()
+    {
+        try
+        {
+            // 🔔 SignalR холболтыг үүсгэх
+            Console.WriteLine($"[{componentId}] Creating SignalR connection...");
+            connection = new HubConnectionBuilder()
+                .WithUrl("http://localhost:5052/hub/flight-status")
+                .WithAutomaticReconnect()
+                .Build();
+
+            // ✈️ Нислэгийн төлөв өөрчлөгдөх үед хүлээн авах
+            connection.On<object>("FlightStatusChanged", async data =>
+            {
+                try
+                {
+                    var json = JsonSerializer.Serialize(data);
+                    Console.WriteLine($"📡 [{componentId}] Raw SignalR JSON: {json}");
+
+                    var update = JsonSerializer.Deserialize<FlightStatusUpdateDto>(
+                        json,
+                        new JsonSerializerOptions { PropertyNameCaseInsensitive = true }
+                    );
+
+                    if (update != null)
+                    {
+                        Console.WriteLine($"✅ [{componentId}] Realtime update: FlightId={update.FlightId}, Status={update.NewStatus}");
+                        var flight = flights.FirstOrDefault(f => f.Id == update.FlightId);
+                        if (flight != null)
+                        {
+                            Console.WriteLine($"🔄 [{componentId}] Updating flight {flight.FlightNumber} from {flight.Status} to {update.NewStatus}");
+                            flight.Status = update.NewStatus;
+                            await InvokeAsync(StateHasChanged);
+                            Console.WriteLine($"✨ [{componentId}] UI updated successfully");
+                        }
+                        else
+                        {
+                            Console.WriteLine($"⚠️ [{componentId}] Flight with ID {update.FlightId} not found in local list");
+                        }
+                    }
+                    else
+                    {
+                        Console.WriteLine($"❌ [{componentId}] Could not parse incoming update.");
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"❌ [{componentId}] Error processing SignalR message: {ex.Message}");
+                }
+            });
+
+            // Connection state logging
+            connection.Closed += error =>
+            {
+                Console.WriteLine($"🔌 [{componentId}] SignalR connection closed. Error: {error?.Message}");
+                return Task.CompletedTask;
+            };
+
+            connection.Reconnecting += error =>
+            {
+                Console.WriteLine($"🔄 [{componentId}] SignalR reconnecting. Error: {error?.Message}");
+                return Task.CompletedTask;
+            };
+
+            connection.Reconnected += connectionId =>
+            {
+                Console.WriteLine($"✅ [{componentId}] SignalR reconnected. Connection ID: {connectionId}");
+                return Task.CompletedTask;
+            };
+
+            await connection.StartAsync();
+            Console.WriteLine($"🚀 [{componentId}] SignalR холболт амжилттай. State: {connection.State}");
+
+            // Force UI update to show connection status
+            await InvokeAsync(StateHasChanged);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"❌ [{componentId}] Error setting up SignalR: {ex.Message}");
+        }
+    }
+
+    private async Task ChangeStatusAsync()
+    {
+
+        await JS.InvokeVoidAsync("console.log", $"[UI] Товч дарлаа: FlightId={testFlightId}, Status={testNewStatus}");
+
+        if (testFlightId <= 0 || string.IsNullOrEmpty(testNewStatus))
+        {
+            testMessage = "❌ Нислэгийн ID болон төлөвийг сонгоно уу!";
+            return;
+        }
+
+        isUpdating = true;
+        testMessage = "";
+        StateHasChanged();
+
+        try
+        {
+            Console.WriteLine($"🚀 [{componentId}] Sending status update: FlightId={testFlightId}, Status={testNewStatus}");
+
+            var updateDto = new FlightStatusUpdateDto
+                {
+                    FlightId = testFlightId,
+                    NewStatus = testNewStatus
+                };
+
+            var response = await Http.PostAsJsonAsync("http://localhost:5052/api/flights/status", updateDto);
+
+            if (response.IsSuccessStatusCode)
+            {
+                testMessage = $"✅ Нислэг {testFlightId}-ийн төлөвийг {testNewStatus} болгон амжилттай өөрчлөлөө!";
+                Console.WriteLine($"✅ [{componentId}] API call successful");
+            }
+            else
+            {
+                var errorContent = await response.Content.ReadAsStringAsync();
+                testMessage = $"❌ Алдаа: {response.StatusCode} - {errorContent}";
+                Console.WriteLine($"❌ [{componentId}] API call failed: {response.StatusCode}");
+            }
+        }
+        catch (Exception ex)
+        {
+            testMessage = $"❌ Алдаа: {ex.Message}";
+            Console.WriteLine($"❌ [{componentId}] Exception during API call: {ex.Message}");
+        }
+        finally
+        {
+            isUpdating = false;
+            StateHasChanged();
+        }
+    }
+
+    private async Task QuickStatusChange(int flightId)
+    {
+        var flight = flights.FirstOrDefault(f => f.Id == flightId);
+        if (flight == null) return;
+
+        var nextStatus = flight.Status switch
+        {
+            "CheckingIn" => "Boarding",
+            "Boarding" => "Departed",
+            "Departed" => "Cancelled",
+            "Cancelled" => "CheckingIn",
+            _ => "Boarding"
+        };
+
+        testFlightId = flightId;
+        testNewStatus = nextStatus;
+        await ChangeStatusAsync();
+    }
+
+    private string GetStatusBadgeClass(string status)
+    {
+        return status switch
+        {
+            "CheckingIn" => "primary",
+            "Boarding" => "warning",
+            "Departed" => "success",
+            "Cancelled" => "danger",
+            _ => "primary"
+        };
+    }
+
+    private string GetConnectionStatusClass()
+    {
+        return connection?.State switch
+        {
+            HubConnectionState.Connected => "success",
+            HubConnectionState.Connecting => "warning",
+            HubConnectionState.Disconnected => "danger",
+            HubConnectionState.Reconnecting => "warning",
+            _ => "secondary"
+        };
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        Console.WriteLine($"🗑️ [{componentId}] Component disposing...");
+        if (connection is not null)
+        {
+            Console.WriteLine($"🔌 [{componentId}] Disposing SignalR connection...");
+            await connection.DisposeAsync();
+        }
+        Console.WriteLine($"✅ [{componentId}] Component disposed");
+    }
+ 
+
+}

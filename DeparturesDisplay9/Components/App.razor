@@ -1,0 +1,36 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <base href="/" />
+    <link rel="stylesheet" href="@Assets["lib/bootstrap/dist/css/bootstrap.min.css"]" />
+    <link rel="stylesheet" href="@Assets["app.css"]" />
+    <link rel="stylesheet" href="@Assets["DeparturesDisplay9.styles.css"]" />
+    <ImportMap />
+    <link rel="icon" type="image/png" href="favicon.png" />
+    <HeadOutlet />
+</head> 
+
+<body>
+    <Router AppAssembly="@typeof(Program).Assembly">
+    <Found Context="routeData">
+        <RouteView RouteData="@routeData" DefaultLayout="@typeof(Layout.MainLayout)" />
+        @* <RouteView RouteData="@routeData" *@
+        @*            DefaultLayout="@typeof(Layout.MainLayout)" *@
+        @*            @key="routeData.PageType" *@
+        @*            RenderMode="InteractiveServer" /> *@
+        <FocusOnNavigate RouteData="@routeData" Selector="h1" />
+    </Found>
+    <NotFound>
+        <LayoutView Layout="@typeof(Layout.MainLayout)">
+            <p class="text-danger">❌ Хуудас олдсонгүй.</p>
+        </LayoutView>
+    </NotFound>
+</Router>
+
+    <script src="_framework/blazor.web.js"></script>
+</body>
+
+</html>

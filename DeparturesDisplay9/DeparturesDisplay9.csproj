@@ -1,0 +1,19 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net9.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.SignalR.Client" Version="9.0.5" />
+  </ItemGroup>
+	
+
+  <ItemGroup>
+    <ProjectReference Include="..\Core\CheckInSystem.DTO\CheckInSystem.DTO.csproj" />
+    <ProjectReference Include="..\Server\CheckInServer.API\CheckInServer.API.csproj" />
+  </ItemGroup>
+
+</Project>
