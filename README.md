@@ -253,7 +253,7 @@ dotnet run --project Server/CheckInServer.API
 | `/api/seats/assign`                          | POST   | Assign a seat to a passenger        |
 | `/api/passengers`                            | GET    | Get all passengers                  |
 | `/api/passengers/{passport}`                 | GET    | Get passenger by passport           |
-| `/api/passengers/boarding/{pass}`            | GET    | Generate boarding pass (JSON)       |
+| `/api/passengers/boarding-pass/{pass}`            | GET    | Generate boarding pass (JSON)       |
 | `/api/flights`                               | GET    | Get all flights                     |
 | `/api/flights/status`                        | POST   | Update flight status                |
 
@@ -351,7 +351,7 @@ POST /api/seats/assign
 |-----------------------------------------|--------|---------------------------------------------|
 | `/api/passengers`                       | GET    | List all passengers                        |
 | `/api/passengers/{passportNumber}`      | GET    | Get passenger info by passport             |
-| `/api/passengers/boarding/{passportNumber}` | GET | Generate a boarding pass (JSON)            |
+| `/api/passengers/boarding-pass/{passportNumber}` | GET | Generate a boarding pass (JSON)            |
 
 ---
 
