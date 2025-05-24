@@ -1,9 +1,13 @@
-﻿using System.Text.Json;
-using System.Net.Http;
-using System.Windows.Forms;
-using System.Text;
-using CheckInSystem.DTO;
+﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel;
+using System.Net.Http;
+using System.Text;
+using System.Text.Json;
+using System.Text.Json.Serialization;
+using System.Threading.Tasks;
+using System.Windows.Forms;
+using CheckInSystem.DTO;
 
 namespace CheckInApp.Forms
 {
@@ -125,9 +129,10 @@ namespace CheckInApp.Forms
         {
             var json = await client.GetStringAsync($"{baseUrl}/api/seats/available?flightId={flightId}");
             var seats = JsonSerializer.Deserialize<List<SeatDto>>(json, jsonOptions);
+
             comboSeatSelection.DataSource = seats;
             comboSeatSelection.DisplayMember = "SeatNumber";
-            comboSeatSelection.ValueMember = "SeatNumber";
+            comboSeatSelection.ValueMember = "SeatId";
         }
 
         private async Task LoadSeatLayout(int flightId)
@@ -149,7 +154,7 @@ namespace CheckInApp.Forms
 
                 seatControl.Click += (s, e) =>
                 {
-                    comboSeatSelection.SelectedValue = seat.SeatNumber;
+                    comboSeatSelection.SelectedValue = seat.SeatId;
                     foreach (Control ctrl in flwLayoutPanelSeat.Controls)
                         if (ctrl is SeatUserControl sc) sc.BorderStyle = BorderStyle.None;
                     seatControl.BorderStyle = BorderStyle.Fixed3D;
@@ -179,45 +184,58 @@ namespace CheckInApp.Forms
         private async void btnAssignSeat_Click(object sender, EventArgs e)
         {
             var passportId = txtPassportId.Text.Trim();
-            var seat = comboSeatSelection.SelectedValue?.ToString();
-
-            if (string.IsNullOrWhiteSpace(passportId) || string.IsNullOrWhiteSpace(seat))
+            if (string.IsNullOrWhiteSpace(passportId) || comboSeatSelection.SelectedValue == null)
             {
                 lblStatusMessage.Text = "Пасспорт эсвэл суудал сонгоно уу";
                 return;
             }
 
-            var json = await client.GetStringAsync($"{baseUrl}/api/passengers/{passportId}");
-            var passenger = JsonSerializer.Deserialize<PassengerDto>(json, jsonOptions);
-
-            if (passenger == null || passenger.Id == 0)
+            var jsonP = await client.GetStringAsync($"{baseUrl}/api/passengers/{passportId}");
+            var passenger = JsonSerializer.Deserialize<PassengerDto>(jsonP, jsonOptions);
+            if (passenger?.Id == 0)
             {
-                lblStatusMessage.Text = "Зорчигчийн ID олдсонгүй!";
+                lblStatusMessage.Text = "Зорчигч олдсонгүй";
                 return;
             }
+
+            var seatId = (int)comboSeatSelection.SelectedValue;
+            var seatNumber = ((SeatDto)comboSeatSelection.SelectedItem).SeatNumber;
 
             var request = new AssignSeatRequestDto
             {
                 PassportNumber = passportId,
                 FlightId = SelectedFlightId,
-                SeatNumber = seat,
-                PassengerId = passenger.Id
+                PassengerId = passenger.Id,
+                SeatId = seatId,
+                SeatNumber = seatNumber
             };
 
-            var content = new StringContent(JsonSerializer.Serialize(request), Encoding.UTF8, "application/json");
-            var response = await client.PostAsync($"{baseUrl}/api/seats/assign", content);
-            var result = await response.Content.ReadAsStringAsync();
+            var payload = JsonSerializer.Serialize(request, new JsonSerializerOptions
+            {
+                PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+            });
+            var content = new StringContent(payload, Encoding.UTF8, "application/json");
 
-            if (response.IsSuccessStatusCode)
+            var response = await client.PostAsync($"{baseUrl}/api/seats/assign", content);
+            var jsonResponse = await response.Content.ReadAsStringAsync();
+            var apiResult = JsonSerializer.Deserialize<ApiResponseDto>(jsonResponse, jsonOptions);
+
+            switch (apiResult?.Status)
             {
-                lblStatusMessage.Text = "Суудал амжилттай оноогдлоо!";
-                await LoadSeatLayout(request.FlightId);
-            }
-            else
-            {
-                lblStatusMessage.Text = result.Contains("seat_taken")
-                    ? "Энэ суудал аль хэдийнээ эзэлсэн байна. Өөр суудал сонгоно уу!"
-                    : $"Алдаа гарлаа: {result}";
+                case "seat_taken":
+                    lblStatusMessage.Text = "Энэ суудал аль хэдийнээ эзэлсэн байна. Өөр суудал сонгоно уу!";
+                    break;
+                case "assigned":
+                    lblStatusMessage.Text = "Суудал амжилттай оноогдлоо!";
+                    await LoadSeats(SelectedFlightId);
+                    await LoadSeatLayout(SelectedFlightId);
+                    break;
+                case "passenger_already_assigned":
+                    lblStatusMessage.Text = apiResult.Message ?? "Зорчигчийн суудал аль хэдийнээ оноогдсон байна";
+                    break;
+                default:
+                    lblStatusMessage.Text = $"Алдаа гарлаа: {jsonResponse}";
+                    break;
             }
         }
 
@@ -225,9 +243,9 @@ namespace CheckInApp.Forms
         {
             foreach (Control ctrl in flwLayoutPanelSeat.Controls)
             {
-                if (ctrl is SeatUserControl seatCtrl)
+                if (ctrl is SeatUserControl sc)
                 {
-                    seatCtrl.BorderStyle = seatCtrl.SeatNumber == comboSeatSelection.SelectedValue?.ToString()
+                    sc.BorderStyle = sc.SeatNumber == (comboSeatSelection.SelectedItem as SeatDto)?.SeatNumber
                         ? BorderStyle.Fixed3D
                         : BorderStyle.None;
                 }
