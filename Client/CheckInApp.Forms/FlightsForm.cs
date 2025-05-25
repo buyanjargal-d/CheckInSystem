@@ -25,7 +25,7 @@ namespace CheckInApp.Forms
         }
 
         private readonly HttpClient client = new();
-        private const string baseUrl = "http://localhost:5052";
+        private const string baseUrl = "http://192.168.10.5:5052";
         private List<FlightDto> allFlights = new();
 
         private async void FlightsForm_Load(object sender, EventArgs e)

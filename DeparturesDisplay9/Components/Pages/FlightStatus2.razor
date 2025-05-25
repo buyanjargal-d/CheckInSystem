@@ -118,7 +118,7 @@ else
 
         try
         {
-            var result = await Http.GetFromJsonAsync<List<FlightDto>>("http://localhost:5052/api/flights");
+            var result = await Http.GetFromJsonAsync<List<FlightDto>>("http://192.168.10.5:5052/api/flights");
             if (result != null)
             {
                 flights = result;
@@ -139,7 +139,7 @@ else
         {
             Console.WriteLine($"[{componentId}] Setting up SignalR connection...");
             connection = new HubConnectionBuilder()
-                .WithUrl("http://localhost:5052/hub/flight-status")
+                .WithUrl("http://192.168.10.5:5052/hub/flight-status")
                 .WithAutomaticReconnect()
                 .Build();
 

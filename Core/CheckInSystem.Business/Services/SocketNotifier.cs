@@ -15,7 +15,7 @@ public class SocketNotifier : ISocketNotifier
     // Сокет холбогдох хостын нэр
     private readonly string _host;
 
-    public SocketNotifier(string host = "localhost", int port = 5050)
+    public SocketNotifier(string host = "192.168.10.5", int port = 5050)
     {
         _host = host;
         _port = port;

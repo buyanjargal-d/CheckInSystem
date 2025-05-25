@@ -1,25 +1,25 @@
 ﻿{
   "$schema": "https://json.schemastore.org/launchsettings.json",
-  "profiles": {
-    // Энэ хэсэгт HTTP протоколыг ашиглан төслийг ажиллуулах тохиргоо байна.
-    "http": {
-      "commandName": "Project", // Төслийг шууд ажиллуулах команд
-      "dotnetRunMessages": true, // dotnet run командын мэдэгдлийг идэвхжүүлнэ
-      "launchBrowser": false, // Төслийг ажиллуулахад браузер автоматаар нээгдэхгүй
-      "applicationUrl": "http://localhost:5052", // Аппликейшний ажиллах хаяг
-      "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "Development" // Хөгжүүлэлтийн орчны тохиргоо
-      }
+    "profiles": {
+        // Энэ хэсэгт HTTP протоколыг ашиглан төслийг ажиллуулах тохиргоо байна.
+        "http": {
+            "commandName": "Project", // Төслийг шууд ажиллуулах команд
+            "dotnetRunMessages": true, // dotnet run командын мэдэгдлийг идэвхжүүлнэ
+            "launchBrowser": false, // Төслийг ажиллуулахад браузер автоматаар нээгдэхгүй
+            "applicationUrl": "http://192.168.10.5:5052", // Аппликейшний ажиллах хаяг
+            "environmentVariables": {
+                "ASPNETCORE_ENVIRONMENT": "Development" // Хөгжүүлэлтийн орчны тохиргоо
+            }
+        }
+        // Доорх хэсэг нь HTTPS протоколын тохиргооны жишээ бөгөөд одоогоор идэвхгүй байна.
+        //"https": {
+        //  "commandName": "Project",
+        //  "dotnetRunMessages": true,
+        //  "launchBrowser": false,
+        //  "applicationUrl": "https://192.168.10.5:7179;http://192.168.10.5:5052",
+        //  "environmentVariables": {
+        //    "ASPNETCORE_ENVIRONMENT": "Development"
+        //  }
+        //}
     }
-    // Доорх хэсэг нь HTTPS протоколын тохиргооны жишээ бөгөөд одоогоор идэвхгүй байна.
-    //"https": {
-    //  "commandName": "Project",
-    //  "dotnetRunMessages": true,
-    //  "launchBrowser": false,
-    //  "applicationUrl": "https://localhost:7179;http://localhost:5052",
-    //  "environmentVariables": {
-    //    "ASPNETCORE_ENVIRONMENT": "Development"
-    //  }
-    //}
-  }
 }

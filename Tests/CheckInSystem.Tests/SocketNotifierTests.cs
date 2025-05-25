@@ -46,7 +46,7 @@ namespace CheckInSystem.Tests
             var listener = new TcpListener(IPAddress.Loopback, port);
             listener.Start();
 
-            var notifier = new SocketNotifier("localhost", port); // Порт дамжуулдаг бүтэцтэй гэж үзсэн
+            var notifier = new SocketNotifier("192.168.10.5", port); // Порт дамжуулдаг бүтэцтэй гэж үзсэн
 
             // Сервер талын мессеж хүлээх task
             var receiveTask = Task.Run(async () =>
@@ -82,7 +82,7 @@ namespace CheckInSystem.Tests
         {
             
             var invalidPort = 9999; 
-            var notifier = new SocketNotifier("localhost", invalidPort);
+            var notifier = new SocketNotifier("192.168.10.5", invalidPort);
 
             // Үйлдэл хийх үед алдаа үүсэх ёсгүй
             var exception = Record.Exception(() => notifier.NotifySeatAssigned(123, 456));
@@ -105,7 +105,7 @@ namespace CheckInSystem.Tests
 
             await Task.Delay(200); // Серверт холболтын хугацаа өгнө
 
-            var notifier = new SocketNotifier("localhost", port);
+            var notifier = new SocketNotifier("192.168.10.5", port);
 
             // Үйлдэл хийгээд алдаа шидэх эсэхийг шалгана
             var ex = Record.Exception(() => notifier.NotifySeatAssigned(99, 100));

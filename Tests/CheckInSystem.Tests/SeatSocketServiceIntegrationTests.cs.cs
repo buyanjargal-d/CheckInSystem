@@ -29,7 +29,7 @@ namespace CheckInSystem.Tests
             server.Start();
 
             // Клиентээс холбогдох
-            var client = new TcpClient("localhost", 5050);
+            var client = new TcpClient("192.168.10.5s", 5050);
             var stream = client.GetStream();
             var json = "{\"type\":\"Assign\",\"seatId\":1,\"passengerId\":101}";
             var bytes = Encoding.UTF8.GetBytes(json);

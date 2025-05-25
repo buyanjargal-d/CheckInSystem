@@ -19,7 +19,7 @@ namespace CheckInApp.Forms
     public partial class CheckInForm : Form
     {
         private readonly HttpClient client = new();
-        private const string baseUrl = "http://localhost:5052";
+        private const string baseUrl = "http://192.168.10.5:5052";
 
         private readonly JsonSerializerOptions jsonOptions = new()
         {
